@@ -217,6 +217,103 @@
     @media(max-width:480px){
       :root{--iframe-h:320px;}
     }
+    /* ── MARKET PAGE ── */
+    .market-container{
+      display:flex;
+      flex-direction:column;
+      height:100%;
+      background:var(--bg);
+      overflow:hidden;
+    }
+    
+    .market-header{
+      padding:20px;
+      background:linear-gradient(135deg,rgba(13,17,23,0.99),rgba(11,14,17,0.99));
+      border-bottom:2px solid var(--border);
+    }
+    
+    .market-title{
+      font-family:'Rajdhani',sans-serif;
+      font-size:1.5rem;
+      font-weight:700;
+      color:var(--gold);
+      margin-bottom:16px;
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+    
+    .asset-selector{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+    
+    .asset-btn{
+      padding:10px 18px;
+      background:rgba(255,255,255,0.05);
+      border:2px solid var(--border);
+      border-radius:10px;
+      color:var(--text);
+      font-size:0.85rem;
+      font-weight:600;
+      cursor:pointer;
+      transition:all 0.3s ease;
+      font-family:'Rajdhani',sans-serif;
+      letter-spacing:0.5px;
+      display:flex;
+      align-items:center;
+      gap:6px;
+    }
+    
+    .asset-btn:hover{
+      background:rgba(240,185,11,0.1);
+      border-color:rgba(240,185,11,0.4);
+      transform:translateY(-2px);
+      box-shadow:0 4px 12px rgba(240,185,11,0.2);
+    }
+    
+    .asset-btn.active{
+      background:linear-gradient(135deg,var(--gold),var(--gold-dim));
+      border-color:var(--gold);
+      color:#000;
+      font-weight:700;
+      box-shadow:0 4px 16px rgba(240,185,11,0.4);
+    }
+    
+    .asset-icon{
+      font-size:1.1rem;
+    }
+    
+    .chart-container{
+      flex:1;
+      position:relative;
+      background:#0a0c0f;
+      overflow:hidden;
+    }
+    
+    .chart-wrapper{
+      position:absolute;
+      inset:0;
+      display:none;
+    }
+    
+    .chart-wrapper.active{
+      display:block;
+    }
+    
+    .chart-frame{
+      width:100%;
+      height:100%;
+      border:none;
+      display:block;
+    }
+    
+    @media (max-width:768px){
+      .market-title{font-size:1.2rem;}
+      .asset-btn{padding:8px 14px;font-size:0.8rem;}
+      .asset-icon{font-size:1rem;}
+    }
   </style>
 </head>
 <body>
@@ -244,6 +341,7 @@
 
 <script>
 const MENU = [
+  {id:'market',label:'Market',icon:'📊',hasContent:false},
   {id:'information',label:'Information',icon:'ℹ️',url:'https://script.google.com/macros/s/AKfycbyJeOhpI4mlVXc65PIOXlxJBA6g7akZ2klbyrAk3c46fUKAvBmFIGK1vzeTcELD6nxO/exec'},
   {id:'payment',label:'Payment',icon:'💳',url:'https://script.google.com/macros/s/AKfycbyaC-WcaBa7lDrZDbpI5bFpWKgBzO21860ZDG-hGmeiCNpdy8xu-IH-ZwUsfx-XTb2bwA/exec'},
   {id:'trader',label:'Trader Profits',icon:'📈',url:'https://script.google.com/macros/s/AKfycbxQNpfnpfdq8JwuPQHUYectRpCZ5z3Rya025D4-QqtFT6hUDDGodFhdMu4QnIzJgpcVEg/exec'},
@@ -484,7 +582,66 @@ MENU.forEach(m => {
   panel.className = 'panel';
   panel.id = 'panel_' + m.id;
 
-  if (m.hasContent && m.url) {
+   // Market Page - Special handling
+  if (m.id === 'market') {
+    panel.innerHTML = `
+      <div class="market-container">
+        <div class="market-header">
+          <div class="market-title">
+            <span>📊</span>
+            <span>Live Market - 15 Minutes Timeframe</span>
+          </div>
+          <div class="asset-selector">
+            <button class="asset-btn active" data-asset="GOLD" onclick="switchAsset('GOLD')">
+              <span class="asset-icon">🏅</span>
+              <span>GOLD</span>
+            </button>
+            <button class="asset-btn" data-asset="BTC" onclick="switchAsset('BTC')">
+              <span class="asset-icon">₿</span>
+              <span>BTC</span>
+            </button>
+            <button class="asset-btn" data-asset="ETH" onclick="switchAsset('ETH')">
+              <span class="asset-icon">Ξ</span>
+              <span>ETH</span>
+            </button>
+            <button class="asset-btn" data-asset="XRP" onclick="switchAsset('XRP')">
+              <span class="asset-icon">✕</span>
+              <span>XRP</span>
+            </button>
+            <button class="asset-btn" data-asset="SOL" onclick="switchAsset('SOL')">
+              <span class="asset-icon">◎</span>
+              <span>SOL</span>
+            </button>
+            <button class="asset-btn" data-asset="BNB" onclick="switchAsset('BNB')">
+              <span class="asset-icon">♦</span>
+              <span>BNB</span>
+            </button>
+          </div>
+        </div>
+        <div class="chart-container">
+          <div class="chart-wrapper active" id="chart-GOLD">
+            <iframe class="chart-frame" src="https://www.tradingview.com/widgetembed/?frameElementId=tradingview_chart&symbol=OANDA%3AXAUUSD&interval=15&hidesidetoolbar=0&hidetoptoolbar=0&symboledit=1&saveimage=1&toolbarbg=0b0e11&studies=%5B%5D&theme=dark&style=1&timezone=Asia%2FBangkok&withdateranges=1&showpopupbutton=1&studies_overrides=%7B%7D&overrides=%7B%7D&enabled_features=%5B%5D&disabled_features=%5B%5D&showpopupbutton=1&locale=en&utm_source=tradercafeclub&utm_medium=widget&utm_campaign=chart&utm_term=OANDA%3AXAUUSD" frameborder="0" allowtransparency="true" scrolling="no" allowfullscreen></iframe>
+          </div>
+          <div class="chart-wrapper" id="chart-BTC">
+            <iframe class="chart-frame" src="https://www.tradingview.com/widgetembed/?frameElementId=tradingview_chart&symbol=BINANCE%3ABTCUSDT&interval=15&hidesidetoolbar=0&hidetoptoolbar=0&symboledit=1&saveimage=1&toolbarbg=0b0e11&studies=%5B%5D&theme=dark&style=1&timezone=Asia%2FBangkok&withdateranges=1&showpopupbutton=1&studies_overrides=%7B%7D&overrides=%7B%7D&enabled_features=%5B%5D&disabled_features=%5B%5D&showpopupbutton=1&locale=en&utm_source=tradercafeclub&utm_medium=widget&utm_campaign=chart&utm_term=BINANCE%3ABTCUSDT" frameborder="0" allowtransparency="true" scrolling="no" allowfullscreen></iframe>
+          </div>
+          <div class="chart-wrapper" id="chart-ETH">
+            <iframe class="chart-frame" src="https://www.tradingview.com/widgetembed/?frameElementId=tradingview_chart&symbol=BINANCE%3AETHUSDT&interval=15&hidesidetoolbar=0&hidetoptoolbar=0&symboledit=1&saveimage=1&toolbarbg=0b0e11&studies=%5B%5D&theme=dark&style=1&timezone=Asia%2FBangkok&withdateranges=1&showpopupbutton=1&studies_overrides=%7B%7D&overrides=%7B%7D&enabled_features=%5B%5D&disabled_features=%5B%5D&showpopupbutton=1&locale=en&utm_source=tradercafeclub&utm_medium=widget&utm_campaign=chart&utm_term=BINANCE%3AETHUSDT" frameborder="0" allowtransparency="true" scrolling="no" allowfullscreen></iframe>
+          </div>
+          <div class="chart-wrapper" id="chart-XRP">
+            <iframe class="chart-frame" src="https://www.tradingview.com/widgetembed/?frameElementId=tradingview_chart&symbol=BINANCE%3AXRPUSDT&interval=15&hidesidetoolbar=0&hidetoptoolbar=0&symboledit=1&saveimage=1&toolbarbg=0b0e11&studies=%5B%5D&theme=dark&style=1&timezone=Asia%2FBangkok&withdateranges=1&showpopupbutton=1&studies_overrides=%7B%7D&overrides=%7B%7D&enabled_features=%5B%5D&disabled_features=%5B%5D&showpopupbutton=1&locale=en&utm_source=tradercafeclub&utm_medium=widget&utm_campaign=chart&utm_term=BINANCE%3AXRPUSDT" frameborder="0" allowtransparency="true" scrolling="no" allowfullscreen></iframe>
+          </div>
+          <div class="chart-wrapper" id="chart-SOL">
+            <iframe class="chart-frame" src="https://www.tradingview.com/widgetembed/?frameElementId=tradingview_chart&symbol=BINANCE%3ASOLUSDT&interval=15&hidesidetoolbar=0&hidetoptoolbar=0&symboledit=1&saveimage=1&toolbarbg=0b0e11&studies=%5B%5D&theme=dark&style=1&timezone=Asia%2FBangkok&withdateranges=1&showpopupbutton=1&studies_overrides=%7B%7D&overrides=%7B%7D&enabled_features=%5B%5D&disabled_features=%5B%5D&showpopupbutton=1&locale=en&utm_source=tradercafeclub&utm_medium=widget&utm_campaign=chart&utm_term=BINANCE%3ASOLUSDT" frameborder="0" allowtransparency="true" scrolling="no" allowfullscreen></iframe>
+          </div>
+          <div class="chart-wrapper" id="chart-BNB">
+            <iframe class="chart-frame" src="https://www.tradingview.com/widgetembed/?frameElementId=tradingview_chart&symbol=BINANCE%3ABNBUSDT&interval=15&hidesidetoolbar=0&hidetoptoolbar=0&symboledit=1&saveimage=1&toolbarbg=0b0e11&studies=%5B%5D&theme=dark&style=1&timezone=Asia%2FBangkok&withdateranges=1&showpopupbutton=1&studies_overrides=%7B%7D&overrides=%7B%7D&enabled_features=%5B%5D&disabled_features=%5B%5D&showpopupbutton=1&locale=en&utm_source=tradercafeclub&utm_medium=widget&utm_campaign=chart&utm_term=BINANCE%3ABNBUSDT" frameborder="0" allowtransparency="true" scrolling="no" allowfullscreen></iframe>
+          </div>
+        </div>
+      </div>`;
+      
+
+  } else if (m.hasContent && m.url) {
     // scroll เดียว: info บน → divider → iframe ล่าง
     panel.innerHTML = `
       <div class="scroll-panel">
@@ -534,6 +691,21 @@ function go(id) {
   document.getElementById('activeLabel').innerHTML = `<b>${m.icon} ${m.label}</b>`;
   document.title = `${m.label} — Trader Cafe Club`;
   history.replaceState(null, '', '#' + id);
+}
+
+// MARKET PAGE - Switch Asset
+function switchAsset(asset) {
+  // Update button states
+  document.querySelectorAll('.asset-btn').forEach(btn => {
+    btn.classList.remove('active');
+  });
+  document.querySelector(`.asset-btn[data-asset="${asset}"]`).classList.add('active');
+  
+  // Update chart visibility
+  document.querySelectorAll('.chart-wrapper').forEach(chart => {
+    chart.classList.remove('active');
+  });
+  document.getElementById(`chart-${asset}`).classList.add('active');
 }
 
 // PRELOAD ALL IFRAMES
