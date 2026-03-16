@@ -1465,7 +1465,8 @@ button:disabled{opacity:0.5;cursor:not-allowed;transform:none!important;}
     <img src="https://i.ibb.co/NbQpSTX/TCC-Logo.png" alt="TCC" onerror="this.style.display='none'">
     <span class="logo-title">TRADER CAFE CLUB</span>
   </div>
-  <span class="hconn chk" id="hconn">⚡ NocoDB</span>
+  <span class="hconn chk" id="hconn">⚡Binance Data Connect…
+</span>
   <div class="active-label" id="activeLabel"><b>🎦 Live Market</b></div>
 </header>
 
@@ -1577,7 +1578,7 @@ button:disabled{opacity:0.5;cursor:not-allowed;transform:none!important;}
     <div style="font-size:3rem;margin-bottom:14px;">🔐</div>
     <div style="font-family:'Orbitron',monospace;font-size:1rem;color:var(--gold);margin-bottom:8px;letter-spacing:2px;">ADMIN ACCESS</div>
     <div style="color:var(--muted,#848E9C);font-size:0.83rem;margin-bottom:24px;">กรุณาเข้าสู่ระบบด้วยอีเมลแอดมิน</div>
-    <div style="margin-bottom:12px;text-align:left;"><label style="font-size:.78rem;color:var(--muted,#848E9C);margin-bottom:6px;display:block;font-weight:600;">อีเมล</label><input type="email" id="login-email" placeholder="admin@tradercafeclub.com" onkeydown="if(event.key==='Enter')doLogin()" style="width:100%;padding:10px 14px;background:var(--dark3,#2B3139);border:1px solid rgba(255,255,255,.06);border-radius:8px;color:#eee;font-family:'Sarabun',sans-serif;font-size:.88rem;box-sizing:border-box;outline:none;"></div>
+    <div style="margin-bottom:12px;text-align:left;"><label style="font-size:.78rem;color:var(--muted,#848E9C);margin-bottom:6px;display:block;font-weight:600;">อีเมล</label><input type="email" id="login-email" placeholder="กรอก Email ของคุณที่นี่" onkeydown="if(event.key==='Enter')doLogin()" style="width:100%;padding:10px 14px;background:var(--dark3,#2B3139);border:1px solid rgba(255,255,255,.06);border-radius:8px;color:#eee;font-family:'Sarabun',sans-serif;font-size:.88rem;box-sizing:border-box;outline:none;"></div>
     <div style="margin-bottom:12px;text-align:left;"><label style="font-size:.78rem;color:var(--muted,#848E9C);margin-bottom:6px;display:block;font-weight:600;">รหัสผ่าน</label><input type="password" id="login-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()" style="width:100%;padding:10px 14px;background:var(--dark3,#2B3139);border:1px solid rgba(255,255,255,.06);border-radius:8px;color:#eee;font-family:'Sarabun',sans-serif;font-size:.88rem;box-sizing:border-box;outline:none;"></div>
     <div id="login-err" style="color:var(--red,#ef4444);font-size:.82rem;margin-bottom:10px;display:none;"></div>
     <button onclick="doLogin()" style="width:100%;padding:12px;background:linear-gradient(135deg,var(--gold),#c99a00);color:#000;border:none;border-radius:8px;font-weight:700;font-size:.95rem;cursor:pointer;margin-bottom:10px;">🔓 เข้าสู่ระบบ</button>
@@ -3216,7 +3217,7 @@ function buildSystemPanel(){
     <div class="auth-sub">กรุณาเข้าสู่ระบบด้วยอีเมลแอดมิน</div>
     <div class="form-group">
       <label class="form-label">อีเมล</label>
-      <input type="email" class="form-control" id="login-email" placeholder="admin@tradercafeclub.com" onkeydown="if(event.key==='Enter')doLogin()">
+      <input type="email" class="form-control" id="login-email" placeholder="กรอก Email ของคุณที่นี่" onkeydown="if(event.key==='Enter')doLogin()">
     </div>
     <div class="form-group">
       <label class="form-label">รหัสผ่าน</label>
@@ -4500,14 +4501,18 @@ async function loadCafeCards(){
       if(rows && rows.length > 0){
         CAFE_CARDS = rows.map(_nocoRowToCafeCard);
         _cafeCardsLoaded = true;
-        statusHTML = `<div style="font-size:.74rem;color:#22c55e;padding:4px 0 10px;">✅ ข้อมูลจาก NocoDB (${CAFE_CARDS.length} cards)</div>`;
+        statusHTML = `<div style="font-size:.74rem;color:#22c55e;padding:4px 0 10px;">✅ ข้อมูลจาก Binance Data Connect…
+ (${CAFE_CARDS.length} cards)</div>`;
       } else {
         if(!_cafeCardsLoaded){ CAFE_CARDS = _defaultCafeCards(); _cafeCardsLoaded=true; }
-        statusHTML = `<div style="font-size:.74rem;color:var(--text-dim);padding:4px 0 10px;">💾 ใช้ข้อมูล default (NocoDB ว่างเปล่า) — กด ➕ เพิ่ม Card เพื่อบันทึกขึ้น NocoDB</div>`;
+        statusHTML = `<div style="font-size:.74rem;color:var(--text-dim);padding:4px 0 10px;">💾 ใช้ข้อมูล default (Binance Data Connect…
+ ว่างเปล่า) — กด ➕ เพิ่ม Card เพื่อบันทึกขึ้น Binance Data Connect…
+</div>`;
       }
     }catch(e){
       if(!_cafeCardsLoaded){ CAFE_CARDS = _defaultCafeCards(); _cafeCardsLoaded=true; }
-      statusHTML = `<div style="font-size:.74rem;color:#f87171;padding:4px 0 10px;">⚠️ NocoDB error: ${e.message}</div>`;
+      statusHTML = `<div style="font-size:.74rem;color:#f87171;padding:4px 0 10px;">⚠️ Binance Data Connect…
+ error: ${e.message}</div>`;
     }
   } else {
     if(!_cafeCardsLoaded){ CAFE_CARDS = _defaultCafeCards(); _cafeCardsLoaded=true; }
@@ -4529,7 +4534,8 @@ function _renderCafeAdminList(){
   <div id="cafe-drag-list" style="display:grid;gap:8px;">
     ${CAFE_CARDS.map((c,i)=>{
       const nocoTag = c._nocoId
-        ? '<span title="NocoDB ✓" style="color:#22c55e;font-size:.65rem;">☁️</span>'
+        ? '<span title="Binance Data Connect…
+ ✓" style="color:#22c55e;font-size:.65rem;">☁️</span>'
         : '<span title="ยังไม่ซิงค์" style="color:var(--text-dim);font-size:.65rem;">💾</span>';
       const typeTag = c.type==='video'
         ? '<span style="background:rgba(255,80,80,.15);color:#ff6b6b;border-radius:4px;padding:1px 7px;font-size:.68rem;">🎬 วีดีโอ</span>'
@@ -4776,7 +4782,8 @@ async function saveCafeCard(){
 
   if(msg){
     msg.className='fmsg ok';
-    msg.textContent=savedToNoco?'✅ บันทึกสำเร็จ (NocoDB ✓)':'✅ บันทึกสำเร็จ (local)';
+    msg.textContent=savedToNoco?'✅ บันทึกสำเร็จ (Binance Data Connect…
+ ✓)':'✅ บันทึกสำเร็จ (local)';
     msg.style.display='block';
   }
   setTimeout(()=>{
@@ -4903,7 +4910,8 @@ function pageContentRenderEditor(key){
     <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px;">
       <span style="font-size:1.05rem;font-weight:700;color:var(--gold);">${meta.label}</span>
       ${isNoco
-        ? `<span style="background:rgba(3,192,117,.15);color:#22c55e;border:1px solid rgba(3,192,117,.35);padding:2px 10px;border-radius:20px;font-size:.72rem;font-weight:600;">✅ บันทึกใน NocoDB</span>
+        ? `<span style="background:rgba(3,192,117,.15);color:#22c55e;border:1px solid rgba(3,192,117,.35);padding:2px 10px;border-radius:20px;font-size:.72rem;font-weight:600;">✅ บันทึกใน Binance Data Connect…
+</span>
            <span style="font-size:.72rem;color:var(--text-dim);">อัปเดต: ${updAt||'-'}</span>`
         : `<span style="background:rgba(240,185,11,.1);color:var(--gold);border:1px solid rgba(240,185,11,.3);padding:2px 10px;border-radius:20px;font-size:.72rem;font-weight:600;">📌 ค่าเริ่มต้น (hardcoded)</span>`}
     </div>
@@ -4923,7 +4931,7 @@ function pageContentRenderEditor(key){
       <button onclick="pcSaveFromBlocks('${key}')"
         style="padding:10px 28px;background:linear-gradient(135deg,#f0b90b,#d4a017);
                color:#000;font-weight:700;border:none;border-radius:10px;cursor:pointer;font-size:.88rem;">
-        💾 บันทึกขึ้น NocoDB
+        💾 บันทึกขึ้น Binance Data Connect…
       </button>
       <button onclick="pcToggleRawEditor('${key}')"
         style="padding:10px 16px;background:rgba(255,255,255,.05);border:1px solid var(--border);
@@ -5233,7 +5241,8 @@ async function pageContentResetDefault(key){
 
 // ── delete from NocoDB (revert to hardcoded) ─────────────────────
 async function pageContentDelete(key){
-  if(!await tccConfirm('🗑️','ลบเนื้อหาจาก NocoDB?','ระบบจะกลับไปใช้ค่าเริ่มต้น (hardcoded) แทน','ลบออก')) return;
+  if(!await tccConfirm('🗑️','ลบเนื้อหาจาก Binance Data Connect…
+?','ระบบจะกลับไปใช้ค่าเริ่มต้น (hardcoded) แทน','ลบออก')) return;
   const cached = _pcDataCache[key];
   if(!cached || !cached.id){ showToast('ไม่พบข้อมูลใน DB'); return; }
   try{
@@ -5272,7 +5281,8 @@ async function initPageContent(){
         _pcDataCache[r.PageKey] = { id:r.Id||r.id, HtmlContent:r.HtmlContent, UpdatedAt:r.UpdatedAt||'' };
       }
     });
-    console.log('✅ PageContent loaded from NocoDB:', Object.keys(_pcDataCache));
+    console.log('✅ PageContent loaded from Binance Data Connect…
+:', Object.keys(_pcDataCache));
   }catch(e){ console.warn('initPageContent:', e); }
 }
 
@@ -6012,7 +6022,8 @@ async function ensureMembersColumns(showResult = false) {
   const cacheKey = `tcc_members_cols_ok_${tableId}`;
   localStorage.setItem(cacheKey, '1');
   const resultEl = showResult ? document.getElementById('db-fix-result') : null;
-  if (resultEl) resultEl.innerHTML = '<span style="color:var(--green)">✅ columns พร้อมใช้งาน (จัดการผ่าน NocoDB UI)</span>';
+  if (resultEl) resultEl.innerHTML = '<span style="color:var(--green)">✅ columns พร้อมใช้งาน (จัดการผ่าน Binance Data Connect…
+ )</span>';
   return { ok: true, msg: 'columns พร้อมใช้งาน' };
 }
 
@@ -6234,7 +6245,8 @@ async function init(){
   if(ct){renderTeams();}
   if(cp){renderRecentPayments&&renderRecentPayments();renderAdminPayments&&renderAdminPayments();updateAdminStats();}
   const allCached=cm&&ct&&cp;
-  if(!allCached) showLoading('กำลังเชื่อมต่อ NocoDB...');
+  if(!allCached) showLoading('กำลังเชื่อมต่อ Binance Data Connect…
+...');
   // v29: set flag ก่อน await เพื่อป้องกัน go() เรียก loadMainData() ซ้อน
   window._initLoadingData = true;
   try{
@@ -6244,7 +6256,8 @@ async function init(){
     await loadPayments();
     hideLoading();
     const el=document.getElementById('hconn'); // v29 fix: hconn ไม่ใช่ db-status
-    if(el){ el.textContent='✅ NocoDB'; el.className='hconn ok'; }
+    if(el){ el.textContent='✅Binance Data Connect…
+'; el.className='hconn ok'; }
     populateRegTeams(); populateRegProvinces(); setTodayDate();
     if(currentAdmin)showAdminDashboard();
     buildSystemPaymentStats&&buildSystemPaymentStats(); // ── อัปเดต pmt-stat-* ใน Payment panel
@@ -7451,12 +7464,15 @@ async function savePayment(){
   const resEl=document.getElementById('save-result');
   try{
     await ndbInsert('payments',payload);
-    resEl.innerHTML='<div class="api-ok">✅ บันทึกลง NocoDB สำเร็จ!</div>';
+    resEl.innerHTML='<div class="api-ok">✅ บันทึกลง Binance Data Connect…
+ สำเร็จ!</div>';
     ssClear(SS_PAYMENTS); await loadPayments(true); clearAdminForm();
-    showSuccess('บันทึกสำเร็จ!',`บันทึกการจ่ายเงินให้ ${memVal(selectedAdminMember,'name')} ลง NocoDB แล้ว`);
+    showSuccess('บันทึกสำเร็จ!',`บันทึกการจ่ายเงินให้ ${memVal(selectedAdminMember,'name')} ลง Binance Data Connect…
+แล้ว`);
   }catch(e){
     resEl.innerHTML=`<div class="api-err">❌ เกิดข้อผิดพลาด: ${e.message}</div>`;
-    btn.textContent='💾 บันทึกและส่งข้อมูลไป NocoDB';btn.disabled=false;
+    btn.textContent='💾 บันทึกและส่งข้อมูลไป Binance Data Connect…
+';btn.disabled=false;
   }
 }
 
@@ -7474,7 +7490,8 @@ function clearAdminForm(){
   const qrEl=document.getElementById('af-qr-code');
   if(qrEl) qrEl.innerHTML='—';
   const btn=document.querySelector('[onclick="savePayment()"]');
-  if(btn){btn.textContent='💾 บันทึกและส่งข้อมูลไป NocoDB';btn.disabled=false;}
+  if(btn){btn.textContent='💾 บันทึกและส่งข้อมูลไป Binance Data Connect…
+';btn.disabled=false;}
 }
 
 async function approvePayment(rowId,btnEl){
@@ -7482,7 +7499,8 @@ async function approvePayment(rowId,btnEl){
   try{
     await ndbUpdate('payments',rowId,{'Field 15':'Approve'});
     ssClear(SS_PAYMENTS); await loadPayments(true);
-    showSuccess('อนุมัติสำเร็จ','อัปเดตสถานะใน NocoDB แล้ว');
+    showSuccess('อนุมัติสำเร็จ','อัปเดตสถานะใน ✅ Binance Data Connect…
+ แล้ว');
   }catch(e){btnEl.textContent='✅ อนุมัติ';btnEl.disabled=false;tccNotif('error','เกิดข้อผิดพลาด',e.message);}
 }
 
@@ -8036,8 +8054,10 @@ async function resetAndRecreateClaim10(){
       // ตาราง Claim10 ยังมีอยู่ใน NocoDB — ยังไม่ได้ลบ
       if(result){
         result.style.color='var(--red)';
-        result.innerHTML = '❌ ยังพบตาราง Claim10 เดิมอยู่ใน NocoDB<br>'
-          + '<span style="font-size:.72rem;color:var(--gold);">📌 กรุณาลบตาราง Claim10 ใน NocoDB ก่อน แล้วกดปุ่มนี้อีกครั้ง</span>';
+        result.innerHTML = '❌ ยังพบตาราง Claim10 เดิมอยู่ใน Binance Data Connect…
+<br>'
+          + '<span style="font-size:.72rem;color:var(--gold);">📌 กรุณาลบตาราง Claim10 ใน Binance Data Connect…
+ ก่อน แล้วกดปุ่มนี้อีกครั้ง</span>';
       }
     }
   } catch(e){
@@ -9379,7 +9399,7 @@ async function loadMainData(){
     await loadPayments();
     hideLoading();
     const el=document.getElementById('hconn');
-    if(el){el.textContent='✅ NocoDB';el.className='hconn ok';}
+    if(el){el.textContent='✅ Binance Data Connect';el.className='hconn ok';}
     populateRegTeams&&populateRegTeams();
     populateRegProvinces&&populateRegProvinces();
     setTodayDate&&setTodayDate();
