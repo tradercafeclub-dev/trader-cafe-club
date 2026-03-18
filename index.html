@@ -1465,7 +1465,7 @@ button:disabled{opacity:0.5;cursor:not-allowed;transform:none!important;}
     <img src="https://i.ibb.co/NbQpSTX/TCC-Logo.png" alt="TCC" onerror="this.style.display='none'">
     <span class="logo-title">TRADER CAFE CLUB</span>
   </div>
-  <span class="hconn chk" id="hconn">Binance Data Connect…</span>
+  <span class="hconn chk" id="hconn">⚡Binance Data Connecting..</span>
   <div class="active-label" id="activeLabel"><b>🎦 Live Market</b></div>
 </header>
 
@@ -1806,7 +1806,7 @@ async function testConn(){
     // ── ตรวจผ่าน Worker /health แทน NocoDB โดยตรง ──
     const r=await fetch(`${WORKER_URL}/health`);
     if(r.ok){
-      el.className='hconn ok';el.textContent='✅ NocoDB';
+      el.className='hconn ok';el.textContent='✅Binance Data Connected';
       setTimeout(()=>{el.style.display='none';},3000);
     } else if(r.status===429){
       el.className='hconn err';el.textContent='⚠️ 429';
@@ -6336,7 +6336,7 @@ async function init(){
     await loadPayments();
     hideLoading();
     const el=document.getElementById('hconn'); // v29 fix: hconn ไม่ใช่ db-status
-    if(el){ el.textContent='✅ NocoDB'; el.className='hconn ok'; }
+    if(el){ el.textContent='✅Binance Data Connected'; el.className='hconn ok'; }
     populateRegTeams(); populateRegProvinces(); setTodayDate();
     if(currentAdmin)showAdminDashboard();
     buildSystemPaymentStats&&buildSystemPaymentStats(); // ── อัปเดต pmt-stat-* ใน Payment panel
@@ -9471,7 +9471,7 @@ async function loadMainData(){
     await loadPayments();
     hideLoading();
     const el=document.getElementById('hconn');
-    if(el){el.textContent='✅ NocoDB';el.className='hconn ok';}
+    if(el){el.textContent='✅Binance Data Connected';el.className='hconn ok';}
     populateRegTeams&&populateRegTeams();
     populateRegProvinces&&populateRegProvinces();
     setTodayDate&&setTodayDate();
