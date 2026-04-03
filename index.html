@@ -1120,7 +1120,75 @@ button:disabled{opacity:0.5;cursor:not-allowed;transform:none!important;}
   .pex-filter-btn{font-size:0.68rem;padding:6px 8px;}
 }
 
-/* ═══ System Panel Styles ═══ */
+/* ═══ TC APPLICATION FLOW — ACCORDION + FORM ═══ */
+/* ── เฉพาะ termcondition panel — ไม่กระทบส่วนอื่นเลย ── */
+.tca-accordion{cursor:default;}
+.tca-head:hover{opacity:.85;}
+.tca-chevron.open{transform:rotate(180deg);}
+
+.tc-flow-wrap{padding:0 0 32px;}
+.tc-step-bar{display:flex;align-items:flex-start;justify-content:center;margin:18px 0 22px;padding:0 4px;position:relative;}
+.tc-step-bar::before{content:'';position:absolute;top:14px;left:10%;right:10%;height:2px;background:var(--border);z-index:0;}
+.tc-step{display:flex;flex-direction:column;align-items:center;gap:5px;flex:1;position:relative;z-index:1;}
+.tc-step-dot{width:30px;height:30px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;background:var(--bg);color:var(--text-dim);transition:all .3s;}
+.tc-step.s-active .tc-step-dot{border-color:var(--gold);background:var(--gold);color:#000;box-shadow:0 0 12px rgba(240,185,11,.5);}
+.tc-step.s-done .tc-step-dot{border-color:var(--gold);background:rgba(240,185,11,.18);color:var(--gold);}
+.tc-step-lbl{font-size:.6rem;color:var(--text-dim);text-align:center;max-width:62px;line-height:1.3;}
+.tc-step.s-active .tc-step-lbl,.tc-step.s-done .tc-step-lbl{color:var(--gold);}
+.tc-step-line{flex:1;height:2px;background:var(--border);margin-top:14px;transition:background .4s;max-width:60px;}
+.tc-step-line.done{background:var(--gold);}
+
+.tc-card{background:linear-gradient(135deg,rgba(17,21,27,.98),rgba(11,14,17,.99));border:1px solid var(--border);border-radius:13px;padding:20px 18px;margin-bottom:14px;}
+.tc-card-ttl{display:flex;align-items:center;gap:9px;font-size:.92rem;font-weight:700;color:var(--gold);margin-bottom:16px;font-family:'Rajdhani',sans-serif;letter-spacing:.5px;border-bottom:1px solid rgba(240,185,11,.12);padding-bottom:10px;}
+.tc-grp{margin-bottom:13px;}
+.tc-lbl{font-size:.76rem;color:var(--text-dim);margin-bottom:5px;display:block;}
+.tc-lbl b{color:var(--gold);}
+.tc-inp{width:100%;padding:10px 13px;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:9px;color:var(--text);font-family:'Prompt',sans-serif;font-size:.86rem;outline:none;transition:border-color .2s,box-shadow .2s;}
+.tc-inp:focus{border-color:var(--gold);box-shadow:0 0 0 2px rgba(240,185,11,.1);}
+.tc-inp::placeholder{color:var(--text-dim);opacity:.6;}
+select.tc-inp{cursor:pointer;}
+textarea.tc-inp{resize:vertical;min-height:72px;}
+.tc-inp-row{display:grid;grid-template-columns:1fr 1fr;gap:11px;}
+@media(max-width:500px){.tc-inp-row{grid-template-columns:1fr;}}
+.tc-err{color:#f87171;font-size:.76rem;margin-top:5px;display:none;}
+.tc-err.on{display:block;}
+.tc-mem-banner{display:flex;align-items:center;gap:12px;background:rgba(240,185,11,.06);border:1px solid rgba(240,185,11,.22);border-radius:10px;padding:11px 13px;margin-bottom:14px;}
+.tc-mem-av{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold-dim));display:flex;align-items:center;justify-content:center;font-size:1rem;font-weight:700;color:#000;flex-shrink:0;}
+.tc-mem-name{font-size:.88rem;font-weight:600;color:var(--text);}
+.tc-mem-sub{font-size:.73rem;color:var(--text-dim);margin-top:1px;}
+.tc-agree-scroll{background:rgba(240,185,11,.03);border:1px solid rgba(240,185,11,.14);border-radius:9px;padding:13px;max-height:240px;overflow-y:auto;font-size:.75rem;color:#bbb;line-height:1.85;margin-bottom:13px;scrollbar-width:thin;scrollbar-color:var(--gold-dim) transparent;}
+.tc-agree-scroll::-webkit-scrollbar{width:3px;}
+.tc-agree-scroll::-webkit-scrollbar-thumb{background:var(--gold-dim);}
+.tc-agree-scroll h4{color:var(--gold);font-size:.8rem;margin:10px 0 3px;font-family:'Rajdhani',sans-serif;}
+.tc-chk-row{display:flex;align-items:flex-start;gap:9px;margin-bottom:14px;cursor:pointer;}
+.tc-chk-row input[type=checkbox]{width:16px;height:16px;accent-color:var(--gold);flex-shrink:0;margin-top:2px;cursor:pointer;}
+.tc-chk-row label{font-size:.79rem;color:var(--text);cursor:pointer;line-height:1.6;}
+.tc-pct-tbl{width:100%;border-collapse:collapse;font-size:.76rem;margin-top:8px;}
+.tc-pct-tbl th{background:rgba(240,185,11,.1);color:var(--gold);padding:7px 8px;border:1px solid rgba(240,185,11,.14);text-align:center;}
+.tc-pct-tbl td{padding:6px 8px;border:1px solid rgba(255,255,255,.05);text-align:center;color:#ccc;}
+.tc-pct-tbl tr:nth-child(even) td{background:rgba(255,255,255,.02);}
+.tc-btn{width:100%;padding:11px;font-weight:700;font-size:.87rem;border:none;border-radius:9px;cursor:pointer;font-family:'Prompt',sans-serif;transition:all .2s;letter-spacing:.3px;}
+.tc-btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold-dim));color:#000;}
+.tc-btn-gold:hover{opacity:.88;transform:translateY(-1px);}
+.tc-btn-gold:disabled{opacity:.4;cursor:not-allowed;transform:none;}
+.tc-btn-out{background:transparent;color:var(--gold);border:1px solid rgba(240,185,11,.35);margin-top:7px;}
+.tc-btn-out:hover{background:rgba(240,185,11,.07);}
+.tc-stat{display:inline-flex;align-items:center;gap:5px;padding:3px 11px;border-radius:20px;font-size:.72rem;font-weight:600;}
+.tc-st-pend{background:rgba(240,185,11,.1);color:var(--gold);border:1px solid rgba(240,185,11,.28);}
+.tc-st-appr{background:rgba(34,197,94,.1);color:#22c55e;border:1px solid rgba(34,197,94,.28);}
+.tc-st-rejt{background:rgba(239,68,68,.1);color:#ef4444;border:1px solid rgba(239,68,68,.28);}
+.tc-st-edit{background:rgba(96,165,250,.1);color:#60a5fa;border:1px solid rgba(96,165,250,.28);}
+.tc-success-box{text-align:center;padding:28px 16px;}
+.tc-success-box .tc-si{font-size:3rem;margin-bottom:10px;}
+.tc-success-box .tc-st{font-size:1.05rem;font-weight:700;color:var(--gold);font-family:'Rajdhani',sans-serif;margin-bottom:6px;}
+.tc-success-box .tc-ss{font-size:.8rem;color:var(--text-dim);line-height:1.75;}
+.tc-ref{display:inline-block;background:rgba(240,185,11,.1);border:1px solid rgba(240,185,11,.28);border-radius:7px;padding:5px 16px;margin:8px 0;font-family:monospace;color:var(--gold);font-size:.88rem;}
+/* ─── ADMIN APPLICATIONS TAB ─── */
+.app-status-sel{padding:5px 10px;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:7px;color:var(--text);font-family:'Prompt',sans-serif;font-size:.78rem;cursor:pointer;}
+.app-row-expand{background:rgba(240,185,11,.03);border-top:1px solid rgba(240,185,11,.08);padding:12px 14px;font-size:.78rem;color:#ccc;line-height:1.8;}
+.app-row-expand b{color:var(--gold);}
+
+/* ═══ END TC APPLICATION FLOW ═══ */
 .sys-tabs{display:flex;gap:6px;flex-wrap:wrap;border-bottom:2px solid var(--border);padding-bottom:10px;margin-bottom:16px;}
 .sys-tab{padding:8px 16px;border-radius:8px 8px 0 0;font-size:.82rem;font-family:'Rajdhani',sans-serif;font-weight:600;cursor:pointer;border:1px solid var(--border);border-bottom:none;color:var(--text-dim);background:rgba(255,255,255,.03);transition:all .2s;letter-spacing:.5px;}
 .sys-tab:hover{background:rgba(240,185,11,.09);color:var(--text);border-color:rgba(240,185,11,.35);}
@@ -1671,7 +1739,8 @@ const NOCO = {
     items:      '',  // จะสร้างผ่าน ensureItemsTable
     cafe:       '',  // จะสร้างผ่าน ensureCafeTable
     cafeshops:  localStorage.getItem('tcc_cafeshops_id') || '',  // ร้านกาแฟที่เข้าร่วม
-    pagecontent: localStorage.getItem('tcc_pagecontent_id') || '' // จัดการหน้าเนื้อหา
+    pagecontent: localStorage.getItem('tcc_pagecontent_id') || '', // จัดการหน้าเนื้อหา
+    applications: 'm99q7si7o4f846h' // ใบสมัครเข้าร่วมโครงการ
   }
 };
 
@@ -2014,26 +2083,44 @@ starttrade:`
     <div class="lvl"><div class="lvl-no">2</div><div class="lvl-txt">ต้องไม่บ่ายเบี่ยงหรือปฏิเสธการเข้าออเดอร์</div></div>
   </div>`,
 termcondition:`
-  <div class="info-card" style="text-align:center;padding:20px;">
-    <img src="https://i.ibb.co/NbQpSTX/TCC-Logo.png" alt="" style="width:54px;border-radius:50%;filter:drop-shadow(0 0 12px var(--gold));margin-bottom:8px;" onerror="this.style.display='none'">
-    <h3 style="font-size:1rem;font-family:'Rajdhani',sans-serif;letter-spacing:1.5px;">เงื่อนไขและข้อตกลงการร่วมเทรด</h3>
+  <!-- ══ ส่วนที่ 1: เนื้อหาเดิม (accordion ปิด/เปิดได้) ══ -->
+  <div class="info-card tca-accordion" id="tca-main-block">
+    <div class="tca-head" onclick="tcaToggle('tca-main-block')" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:4px 0;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <img src="https://i.ibb.co/NbQpSTX/TCC-Logo.png" alt="" style="width:36px;height:36px;border-radius:50%;filter:drop-shadow(0 0 7px var(--gold));" onerror="this.style.display='none'">
+        <span style="font-size:.95rem;font-family:'Rajdhani',sans-serif;letter-spacing:1px;font-weight:700;color:var(--gold);">📋 เงื่อนไขและข้อตกลงการร่วมเทรด</span>
+      </div>
+      <span class="tca-chevron" id="tca-main-block-chev" style="font-size:1rem;color:var(--gold);transition:transform .3s;">▼</span>
+    </div>
+    <div class="tca-body" id="tca-main-block-body" style="display:none;margin-top:14px;border-top:1px solid var(--border);padding-top:14px;">
+      <div class="info-card" style="background:rgba(255,255,255,.02);border-color:rgba(240,185,11,.12);">
+        <h3>🛡️ ข้อตกลงหลัก</h3>
+        <p>เทรดในพอร์ตของตัวเองบน <b style="color:var(--gold)">Binance</b> อันดับ 1 ของโลก — ไม่มีการเชื่อมต่อภายนอก</p>
+      </div>
+      <div class="info-card" style="background:rgba(255,255,255,.02);border-color:rgba(240,185,11,.12);">
+        <h3>✅ คุณสมบัติที่ต้องมี</h3>
+        <div class="lvl"><div class="lvl-no">1</div><div class="lvl-txt">บัญชีไบแนนซ์ KYC + Pass Key</div></div>
+        <div class="lvl"><div class="lvl-no">2</div><div class="lvl-txt">มีทีม/ร้านกาแฟต้นสังกัด</div></div>
+        <div class="lvl"><div class="lvl-no">3</div><div class="lvl-txt">เงินทุนใน USDT สำหรับการเทรด</div></div>
+      </div>
+      <div class="info-card" style="background:rgba(255,255,255,.02);border-color:rgba(240,185,11,.12);">
+        <h3>💵 สัดส่วนรายได้</h3>
+        <div class="lvl"><div class="lvl-no">1</div><div class="lvl-txt">คอมมิชชั่นทีม <b>10%</b></div></div>
+        <div class="lvl"><div class="lvl-no">2</div><div class="lvl-txt">ประกันรายได้ <b>10%</b></div></div>
+        <div class="lvl"><div class="lvl-no">3</div><div class="lvl-txt">รายได้ผู้เทรด <b>40%</b></div></div>
+        <div class="lvl"><div class="lvl-no">4</div><div class="lvl-txt">บริหารระบบ <b>40%</b></div></div>
+      </div>
+      <div class="info-card" style="background:rgba(255,255,255,.02);border-color:rgba(240,185,11,.12);">
+        <h3>📌 ข้อห้าม</h3>
+        <div class="lvl"><div class="lvl-no">1</div><div class="lvl-txt">ห้ามปิด/เปิดออเดอร์เองโดยไม่ได้รับอนุมัติจากเลขา</div></div>
+        <div class="lvl"><div class="lvl-no">2</div><div class="lvl-txt">ห้ามบ่ายเบี่ยงหรือปฏิเสธการเข้าออเดอร์</div></div>
+      </div>
+    </div>
   </div>
-  <div class="info-card"><h3>🛡️ ข้อตกลงหลัก</h3><p>เทรดในพอร์ตของตัวเองบน <b style="color:var(--gold)">Binance</b> อันดับ 1 ของโลก — ไม่มีการเชื่อมต่อภายนอก</p></div>
-  <div class="info-card"><h3>✅ คุณสมบัติที่ต้องมี</h3>
-    <div class="lvl"><div class="lvl-no">1</div><div class="lvl-txt">บัญชีไบแนนซ์ KYC + Pass Key</div></div>
-    <div class="lvl"><div class="lvl-no">2</div><div class="lvl-txt">มีทีม/ร้านกาแฟต้นสังกัด</div></div>
-    <div class="lvl"><div class="lvl-no">3</div><div class="lvl-txt">เงินทุนใน USDT สำหรับการเทรด</div></div>
-  </div>
-  <div class="info-card"><h3>💵 สัดส่วนรายได้</h3>
-    <div class="lvl"><div class="lvl-no">1</div><div class="lvl-txt">คอมมิชชั่นทีม <b>10%</b></div></div>
-    <div class="lvl"><div class="lvl-no">2</div><div class="lvl-txt">ประกันรายได้ <b>10%</b></div></div>
-    <div class="lvl"><div class="lvl-no">3</div><div class="lvl-txt">รายได้ผู้เทรด <b>40%</b></div></div>
-    <div class="lvl"><div class="lvl-no">4</div><div class="lvl-txt">บริหารระบบ <b>40%</b></div></div>
-  </div>
-  <div class="info-card"><h3>📌 ข้อห้าม</h3>
-    <div class="lvl"><div class="lvl-no">1</div><div class="lvl-txt">ห้ามปิด/เปิดออเดอร์เองโดยไม่ได้รับอนุมัติจากเลขา</div></div>
-    <div class="lvl"><div class="lvl-no">2</div><div class="lvl-txt">ห้ามบ่ายเบี่ยงหรือปฏิเสธการเข้าออเดอร์</div></div>
-  </div>`,
+
+  <!-- ══ ส่วนที่ 2: แบบฟอร์มยื่นใบสมัคร ══ -->
+  <div id="tc-app-root"></div>
+`,
 aboutus:`
   <div class="info-card" style="text-align:center;padding:20px;">
     <img src="https://i.ibb.co/NbQpSTX/TCC-Logo.png" alt="" style="width:54px;border-radius:50%;filter:drop-shadow(0 0 12px var(--gold));margin-bottom:8px;" onerror="this.style.display='none'">
@@ -3256,6 +3343,7 @@ function buildSystemPanel(){
     <button class="nav-tab"        id="atab-content"     onclick="switchAdminTab('content')">📋 จัดการเนื้อหา</button>
     <button class="nav-tab"        id="atab-cafe"        onclick="switchAdminTab('cafe')">☕ จัดการคาเฟ่</button>
     <button class="nav-tab"        id="atab-dbtools"     onclick="switchAdminTab('dbtools')">🔧 ฐานข้อมูล</button>
+    <button class="nav-tab"        id="atab-applications" onclick="switchAdminTab('applications')">📝 ใบสมัคร</button>
   </div>
 
   <!-- TAB: PAYMENT -->
@@ -3767,6 +3855,68 @@ function buildSystemPanel(){
         <div id="acs-table-wrap" style="overflow-x:auto;">
           <div style="text-align:center;padding:40px;color:var(--muted);">⏳ กำลังโหลด...</div>
         </div>
+      </div>
+    </div>
+  </div>
+  <!-- ══════════════════════════════════════════
+       📝 ใบสมัครเข้าร่วมโครงการ Tab
+  ══════════════════════════════════════════ -->
+  <div id="admin-tab-applications" style="display:none;">
+    <!-- Stats -->
+    <div class="stats-row" style="margin-bottom:14px;">
+      <div class="stat-card"><div class="stat-icon">📋</div><div class="stat-val" id="aapp-total">—</div><div class="stat-lbl">ใบสมัครทั้งหมด</div></div>
+      <div class="stat-card" style="border-top-color:#f0b90b;"><div class="stat-icon">⏳</div><div class="stat-val" id="aapp-pending" style="color:var(--gold);">—</div><div class="stat-lbl">รอดำเนินการ</div></div>
+      <div class="stat-card" style="border-top-color:var(--green);"><div class="stat-icon">✅</div><div class="stat-val" id="aapp-approved" style="color:var(--green);">—</div><div class="stat-lbl">อนุมัติแล้ว</div></div>
+      <div class="stat-card" style="border-top-color:var(--red);"><div class="stat-icon">❌</div><div class="stat-val" id="aapp-rejected" style="color:var(--red);">—</div><div class="stat-lbl">ไม่อนุมัติ</div></div>
+      <div class="stat-card" style="border-top-color:#60a5fa;"><div class="stat-icon">✏️</div><div class="stat-val" id="aapp-editing" style="color:#60a5fa;">—</div><div class="stat-lbl">แก้ไขข้อมูล</div></div>
+    </div>
+    <!-- Search + Filter + Refresh -->
+    <div class="card" style="margin-bottom:10px;">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+        <input class="clp-search-input" id="aapp-q" placeholder="🔍 ค้นหา BNB ID / ชื่อ / ทีม..." oninput="renderAdminApps()" style="flex:3;min-width:200px;">
+        <select class="app-status-sel" id="aapp-filter" onchange="renderAdminApps()">
+          <option value="">🔽 สถานะทั้งหมด</option>
+          <option value="Pending">⏳ Pending</option>
+          <option value="Approved">✅ Approved</option>
+          <option value="Rejected">❌ Rejected</option>
+          <option value="Editing">✏️ Editing</option>
+        </select>
+        <button class="btn btn-outline btn-sm" onclick="loadAdminApps(true)" style="white-space:nowrap;">🔄 รีเฟรช</button>
+        <button class="btn btn-outline btn-sm" onclick="exportAppsCSV()" style="white-space:nowrap;">📥 CSV</button>
+      </div>
+    </div>
+    <!-- Table -->
+    <div class="card">
+      <div class="card-hd">
+        <div class="card-icon">📝</div>
+        <span class="card-title">รายการใบสมัคร</span>
+        <span id="aapp-row-count" style="margin-left:auto;font-size:.78rem;color:var(--muted);">0 รายการ</span>
+      </div>
+      <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;font-size:.78rem;" id="aapp-table">
+          <thead>
+            <tr style="border-bottom:1px solid var(--border);">
+              <th style="padding:9px 10px;text-align:left;color:var(--text-dim);font-weight:600;white-space:nowrap;">#</th>
+              <th style="padding:9px 10px;text-align:left;color:var(--text-dim);font-weight:600;white-space:nowrap;">BNB ID</th>
+              <th style="padding:9px 10px;text-align:left;color:var(--text-dim);font-weight:600;white-space:nowrap;">ชื่อ</th>
+              <th style="padding:9px 10px;text-align:left;color:var(--text-dim);font-weight:600;white-space:nowrap;">ทีม</th>
+              <th style="padding:9px 10px;text-align:center;color:var(--text-dim);font-weight:600;white-space:nowrap;">เป้าหมาย</th>
+              <th style="padding:9px 10px;text-align:center;color:var(--text-dim);font-weight:600;white-space:nowrap;">วันที่ยื่น</th>
+              <th style="padding:9px 10px;text-align:center;color:var(--text-dim);font-weight:600;white-space:nowrap;">สถานะ</th>
+              <th style="padding:9px 10px;text-align:center;color:var(--text-dim);font-weight:600;white-space:nowrap;">จัดการ</th>
+            </tr>
+          </thead>
+          <tbody id="aapp-tbody">
+            <tr><td colspan="8" style="text-align:center;padding:40px;color:var(--text-dim);">⏳ กำลังโหลด...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <!-- Detail Modal -->
+    <div id="aapp-detail-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:9000;align-items:center;justify-content:center;padding:16px;">
+      <div style="background:#0f1318;border:1px solid var(--border);border-radius:14px;width:100%;max-width:640px;max-height:92vh;overflow-y:auto;padding:24px;position:relative;">
+        <button onclick="closeAppDetail()" style="position:absolute;top:14px;right:14px;background:rgba(255,255,255,.07);border:none;color:var(--text);width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:1rem;">✕</button>
+        <div id="aapp-detail-content"></div>
       </div>
     </div>
   </div>
@@ -8146,7 +8296,7 @@ function switchAdminTab(tab){
     showSuccess('⛔ ไม่มีสิทธิ์เข้าถึง', 'กรุณาติดต่อ Super Admin เพื่อขอสิทธิ์ ' + (PERM_MODULES[permMod]?.label||tab));
     return;
   }
-  ['payment','members','wallets','teams','admins','commapprove','claimlp','claim10','content','cafe','dbtools'].forEach(t=>{
+  ['payment','members','wallets','teams','admins','commapprove','claimlp','claim10','content','cafe','dbtools','applications'].forEach(t=>{
     const el=document.getElementById(`admin-tab-${t}`);
     const btn=document.getElementById(`atab-${t}`);
     if(el)el.style.display=t===tab?'block':'none';
@@ -8175,6 +8325,7 @@ function switchAdminTab(tab){
   if(tab==='wallets') renderWalletsList&&renderWalletsList();
   if(tab==='teams')   renderAdminTeams&&renderAdminTeams();
   if(tab==='admins')  loadAdminsFromWorker&&loadAdminsFromWorker();
+  if(tab==='applications') loadAdminApps&&loadAdminApps();
 }
 
 // showPage — defined below in commission section
@@ -12525,8 +12676,541 @@ document.addEventListener('DOMContentLoaded', async function(){
   }
 });
 
+// ════════════════════════════════════════════════════════════════
+//  TC APPLICATION FLOW — Terms & Conditions Panel
+//  ⚠️ แยกเป็น namespace tc_ ทั้งหมด — ไม่ใช้ชื่อตัวแปรซ้ำกับระบบเดิม
+// ════════════════════════════════════════════════════════════════
+
+// ── Accordion toggle (เนื้อหาเดิม) ──────────────────────────────
+function tcaToggle(id){
+  const body = document.getElementById(id+'-body');
+  const chev = document.getElementById(id+'-chev');
+  if(!body||!chev) return;
+  const open = body.style.display !== 'none';
+  body.style.display = open ? 'none' : 'block';
+  chev.style.transform = open ? '' : 'rotate(180deg)';
+}
+
+// ── State ────────────────────────────────────────────────────────
+const TC = {
+  step: 1,
+  member: null,
+  appRow: null,
+  appId: null,
+  passwordHash: '',
+};
+
+// ── SHA-256 hash helper ──────────────────────────────────────────
+async function tcHash(str){
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+// ── render ────────────────────────────────────────────────────────
+function tcRender(){
+  const root = document.getElementById('tc-app-root');
+  if(!root) return;
+  switch(TC.step){
+    case 1: root.innerHTML = tcStep1HTML(); break;
+    case 2: root.innerHTML = tcStep2HTML(); break;
+    case 3: root.innerHTML = tcStep3HTML(); break;
+    case 4: root.innerHTML = tcStep4HTML(); break;
+    case 5: root.innerHTML = tcStep5HTML(); break;
+  }
+}
+
+// ── Step bar ─────────────────────────────────────────────────────
+function tcStepBar(cur){
+  const steps = [{n:1,lbl:'BNB ID'},{n:2,lbl:'ยืนยันตัวตน'},{n:3,lbl:'รหัสผ่าน'},{n:4,lbl:'กรอกใบสมัคร'}];
+  let h = '<div class="tc-step-bar">';
+  steps.forEach((s,i)=>{
+    const cls = cur>s.n ? 's-done' : cur===s.n ? 's-active' : '';
+    const icon = cur>s.n ? '✓' : s.n;
+    h += `<div class="tc-step ${cls}"><div class="tc-step-dot">${icon}</div><div class="tc-step-lbl">${s.lbl}</div></div>`;
+    if(i<steps.length-1) h += `<div class="tc-step-line ${cur>s.n?'done':''}"></div>`;
+  });
+  return h+'</div>';
+}
+
+// ── Step 1 ───────────────────────────────────────────────────────
+function tcStep1HTML(){
+  return `<div class="tc-flow-wrap">
+    ${tcStepBar(1)}
+    <div class="tc-card">
+      <div class="tc-card-ttl">🔍 ขั้นตอนที่ 1 — ระบุหมายเลขสมาชิก</div>
+      <div class="tc-grp">
+        <label class="tc-lbl">หมายเลขสมาชิก <b>(BNB ID)</b></label>
+        <input class="tc-inp" id="tc-bnbid-inp" placeholder="กรอก BNB ID ของคุณ" maxlength="40"
+          onkeydown="if(event.key==='Enter')tcStep1Submit()">
+        <div class="tc-err" id="tc-step1-err"></div>
+      </div>
+      <button class="tc-btn tc-btn-gold" onclick="tcStep1Submit()">ค้นหาข้อมูลสมาชิก →</button>
+    </div>
+  </div>`;
+}
+
+async function tcStep1Submit(){
+  const inp = document.getElementById('tc-bnbid-inp');
+  const err = document.getElementById('tc-step1-err');
+  if(!inp) return;
+  const val = inp.value.trim();
+  if(!val){ tcShowErr(err,'กรุณากรอก BNB ID'); return; }
+  inp.disabled = true;
+  if(!MEMBERS||!MEMBERS.length){
+    tcShowErr(err,'⏳ กำลังโหลดข้อมูลสมาชิก...');
+    let w=0;
+    while((!MEMBERS||!MEMBERS.length)&&w<30){ await new Promise(r=>setTimeout(r,500)); w++; }
+    if(!MEMBERS||!MEMBERS.length){ inp.disabled=false; tcShowErr(err,'ไม่สามารถโหลดข้อมูลสมาชิกได้ กรุณาลองใหม่'); return; }
+  }
+  const found = MEMBERS.find(m=>memVal(m,'id').toLowerCase()===val.toLowerCase());
+  if(!found){ inp.disabled=false; tcShowErr(err,'ไม่พบหมายเลขสมาชิก "'+val+'" ในระบบ'); return; }
+  TC.member = found;
+  try{
+    const res = await nocoGet(NOCO.tbl.applications,`&where=(BNB_ID,eq,${val})`);
+    TC.appRow = (res&&res.length) ? res[0] : null;
+    TC.appId  = TC.appRow ? (TC.appRow.Id||TC.appRow.id) : null;
+  }catch(e){ TC.appRow=null; TC.appId=null; }
+  TC.step=2; tcRender();
+}
+
+// ── Step 2 ───────────────────────────────────────────────────────
+function tcStep2HTML(){
+  const m=TC.member;
+  const name=memVal(m,'name');
+  const masked = name.length>2 ? name.charAt(0)+'*'.repeat(name.length-2)+name.charAt(name.length-1) : name;
+  return `<div class="tc-flow-wrap">
+    ${tcStepBar(2)}
+    <div class="tc-card">
+      <div class="tc-card-ttl">📱 ขั้นตอนที่ 2 — ยืนยันตัวตน</div>
+      <div class="tc-mem-banner">
+        <div class="tc-mem-av">${(name||'?').charAt(0).toUpperCase()}</div>
+        <div><div class="tc-mem-name">${masked}</div>
+        <div class="tc-mem-sub">ทีม: ${memVal(m,'team')||'—'} &nbsp;|&nbsp; ID: ${memVal(m,'id')}</div></div>
+      </div>
+      ${TC.appRow ? `<div style="background:rgba(96,165,250,.07);border:1px solid rgba(96,165,250,.2);border-radius:8px;padding:10px 13px;margin-bottom:13px;font-size:.78rem;color:#93c5fd;">
+        ℹ️ พบใบสมัครของคุณ &nbsp; สถานะ: ${tcStatusBadge(TC.appRow.Status||'Pending')}
+        <br><span style="color:var(--text-dim);font-size:.73rem;">ยืนยันตัวตนเพื่อดูหรือแก้ไขใบสมัคร</span>
+      </div>` : ''}
+      <div class="tc-grp">
+        <label class="tc-lbl">เบอร์โทรศัพท์ที่ลงทะเบียนไว้</label>
+        <input class="tc-inp" id="tc-phone-inp" placeholder="เช่น 0812345678" maxlength="20" type="tel"
+          onkeydown="if(event.key==='Enter')tcStep2Submit()">
+        <div class="tc-err" id="tc-step2-err"></div>
+      </div>
+      <button class="tc-btn tc-btn-gold" onclick="tcStep2Submit()">ยืนยันตัวตน →</button>
+      <button class="tc-btn tc-btn-out" onclick="tcBack()">← กลับ</button>
+    </div>
+  </div>`;
+}
+
+function tcStep2Submit(){
+  const inp=document.getElementById('tc-phone-inp');
+  const err=document.getElementById('tc-step2-err');
+  if(!inp) return;
+  const val=inp.value.trim().replace(/[^0-9]/g,'');
+  if(!val||val.length<9){ tcShowErr(err,'กรุณากรอกเบอร์โทรให้ถูกต้อง'); return; }
+  const stored=(TC.member['Phone']||'').replace(/[^0-9]/g,'');
+  if(!stored){ tcShowErr(err,'ไม่พบเบอร์โทรในระบบ กรุณาติดต่อแอดมิน'); return; }
+  if(val!==stored){ tcShowErr(err,'เบอร์โทรไม่ตรงกับที่ลงทะเบียนไว้'); return; }
+  TC.step=3; tcRender();
+}
+
+// ── Step 3 ───────────────────────────────────────────────────────
+function tcStep3HTML(){
+  const hasPass = TC.appRow && TC.appRow.PasswordHash;
+  return `<div class="tc-flow-wrap">
+    ${tcStepBar(3)}
+    <div class="tc-card">
+      <div class="tc-card-ttl">${hasPass?'🔑 เข้าสู่ระบบ':'🔐 ตั้งรหัสผ่าน'}</div>
+      <p style="font-size:.79rem;color:var(--text-dim);margin-bottom:14px;">
+        ${hasPass?'กรอกรหัสผ่านที่คุณตั้งไว้':'ตั้งรหัสผ่านสำหรับการเข้าถึงใบสมัครในครั้งถัดไป (อย่างน้อย 6 ตัวอักษร)'}
+      </p>
+      <div class="tc-grp">
+        <label class="tc-lbl">${hasPass?'รหัสผ่าน':'รหัสผ่านใหม่'}</label>
+        <input class="tc-inp" id="tc-pass-inp" type="password" placeholder="••••••••" maxlength="64"
+          onkeydown="if(event.key==='Enter')tcStep3Submit()">
+        <div class="tc-err" id="tc-step3-err"></div>
+      </div>
+      ${!hasPass?`<div class="tc-grp">
+        <label class="tc-lbl">ยืนยันรหัสผ่าน</label>
+        <input class="tc-inp" id="tc-pass2-inp" type="password" placeholder="••••••••" maxlength="64"
+          onkeydown="if(event.key==='Enter')tcStep3Submit()">
+      </div>`:''}
+      <button class="tc-btn tc-btn-gold" onclick="tcStep3Submit()">${hasPass?'เข้าสู่ระบบ →':'ตั้งรหัสผ่านและดำเนินการต่อ →'}</button>
+      <button class="tc-btn tc-btn-out" onclick="tcBack()">← กลับ</button>
+    </div>
+  </div>`;
+}
+
+async function tcStep3Submit(){
+  const inp=document.getElementById('tc-pass-inp');
+  const inp2=document.getElementById('tc-pass2-inp');
+  const err=document.getElementById('tc-step3-err');
+  if(!inp) return;
+  const pass=inp.value;
+  if(pass.length<6){ tcShowErr(err,'รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร'); return; }
+  const hasPass=TC.appRow&&TC.appRow.PasswordHash;
+  const hash=await tcHash(pass);
+  if(hasPass){
+    if(hash!==TC.appRow.PasswordHash){ tcShowErr(err,'รหัสผ่านไม่ถูกต้อง'); return; }
+  } else {
+    if(inp2&&inp2.value!==pass){ tcShowErr(err,'รหัสผ่านทั้งสองช่องไม่ตรงกัน'); return; }
+  }
+  TC.passwordHash=hash; TC.step=4; tcRender();
+}
+
+// ── Step 4 ───────────────────────────────────────────────────────
+function tcStep4HTML(){
+  const r=TC.appRow||{};
+  const m=TC.member;
+  const isEdit=!!TC.appRow;
+  return `<div class="tc-flow-wrap">
+    ${tcStepBar(4)}
+    ${isEdit?`<div style="background:rgba(240,185,11,.05);border:1px solid rgba(240,185,11,.18);border-radius:9px;padding:10px 13px;margin-bottom:13px;font-size:.78rem;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+      <span>สถานะปัจจุบัน:</span>${tcStatusBadge(r.Status||'Pending')}
+      ${r.AdminNote?`<span style="color:var(--text-dim);font-size:.73rem;">📝 แอดมิน: ${r.AdminNote}</span>`:''}
+    </div>`:''}
+    <div class="tc-card">
+      <div class="tc-card-ttl">👤 ข้อมูลสมาชิก</div>
+      <div class="tc-mem-banner">
+        <div class="tc-mem-av">${(memVal(m,'name')||'?').charAt(0).toUpperCase()}</div>
+        <div><div class="tc-mem-name">${memVal(m,'name')}</div>
+        <div class="tc-mem-sub">BNB ID: ${memVal(m,'id')} &nbsp;|&nbsp; ทีม: ${memVal(m,'team')||'—'}</div></div>
+      </div>
+    </div>
+    <div class="tc-card">
+      <div class="tc-card-ttl">🎯 เป้าหมายและผลตอบแทน</div>
+      <div class="tc-inp-row">
+        <div class="tc-grp">
+          <label class="tc-lbl">ระยะเวลาเป้าหมาย <b>(เดือน)</b></label>
+          <input class="tc-inp" id="tc-months" type="number" min="1" max="60" placeholder="เช่น 3" value="${r.TargetMonths||''}" oninput="tcUpdatePct()">
+        </div>
+        <div class="tc-grp">
+          <label class="tc-lbl">จำนวนสมาชิกเป้าหมาย <b>(คน)</b></label>
+          <input class="tc-inp" id="tc-members-target" type="number" min="1" placeholder="เช่น 20" value="${r.TargetMembers||''}" oninput="tcUpdatePct()">
+        </div>
+      </div>
+      <div class="tc-inp-row">
+        <div class="tc-grp">
+          <label class="tc-lbl">วงเงินเทรดเป้าหมาย <b>(USDT)</b></label>
+          <input class="tc-inp" id="tc-volume" type="number" min="0" placeholder="เช่น 10000" value="${r.TargetVolume||''}" oninput="tcUpdatePct()">
+        </div>
+        <div class="tc-grp">
+          <label class="tc-lbl">ค่าบริหารทีมที่ต้องการ <b>(บาท)</b></label>
+          <input class="tc-inp" id="tc-bonus" type="number" min="0" placeholder="เช่น 50000" value="${r.BonusAmount||''}" oninput="tcUpdatePct()">
+        </div>
+      </div>
+      <div style="font-size:.74rem;color:var(--text-dim);margin-bottom:6px;">📊 ตารางผลตอบแทนตาม % ความสำเร็จ</div>
+      <div style="overflow-x:auto;">
+        <table class="tc-pct-tbl">
+          <thead><tr><th>%สำเร็จ</th><th>สมาชิก(คน)</th><th>วงเงิน(USDT)</th><th>ค่าบริหาร(฿)</th></tr></thead>
+          <tbody>
+            ${[25,50,75,100].map(p=>`<tr>
+              <td><b>${p}%</b></td>
+              <td id="tp-m${p}">-</td><td id="tp-v${p}">-</td><td id="tp-b${p}">-</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="tc-card">
+      <div class="tc-card-ttl">📋 รายละเอียดเพิ่มเติม</div>
+      <div class="tc-grp">
+        <label class="tc-lbl">ตำแหน่งที่ต้องการ</label>
+        <select class="tc-inp" id="tc-position">
+          <option value="">-- เลือกตำแหน่ง --</option>
+          ${['ผู้บริหารฐานข้อมูล','ผู้บริหารทีม','หัวหน้างาน','อื่นๆ'].map(v=>`<option value="${v}" ${(r.DesiredPosition||'')=== v?'selected':''}>${v}</option>`).join('')}
+        </select>
+      </div>
+      <div class="tc-grp">
+        <label class="tc-lbl">บันทึกข้อตกลงเพิ่มเติม</label>
+        <textarea class="tc-inp" id="tc-note" placeholder="ระบุรายละเอียดหรือข้อตกลงเพิ่มเติม...">${r.ExtraNote||''}</textarea>
+      </div>
+      <div class="tc-err" id="tc-step4-err"></div>
+    </div>
+    <div class="tc-card">
+      <div class="tc-card-ttl">📜 บันทึกข้อตกลงเข้าร่วมโครงการ</div>
+      <div class="tc-agree-scroll">
+        <h4>๑. วัตถุประสงค์</h4>
+        <p>บันทึกข้อตกลงฉบับนี้จัดทำขึ้นระหว่างคณะกรรมการบริหารโครงการ Trader Café Club กับผู้สมัครในตำแหน่งผู้บริหารฐานข้อมูล เพื่อสร้างและขยายฐานความรู้ด้านการเทรดสินทรัพย์ดิจิทัลผ่านแพลตฟอร์ม Binance/Binance TH</p>
+        <h4>๒. หน้าที่และความรับผิดชอบ</h4>
+        <p>สร้างและขยายสมาชิก อบรม KYC, Passkey, การเทรด, การฝาก-ถอน, TP/SL ให้สมาชิกในทีม</p>
+        <h4>๓. ค่าตอบแทน</h4>
+        <p>• สมาชิกในทีม: 10% ของกำไรสุทธิ<br>• Level A: 15% ค่าบริหารทีม<br>• Level B: 10% ค่าบริหารทีม<br>• จ่ายทุกวันที่ 15 ของเดือนถัดไป</p>
+        <h4>๔. ข้อผูกพันกฎหมาย</h4>
+        <p>ปฏิบัติตาม พ.ร.ก.สินทรัพย์ดิจิทัล พ.ศ.2561, PDPA พ.ศ.2562 และกฎหมายภาษีอากรที่เกี่ยวข้อง</p>
+        <h4>๕. ข้อห้าม</h4>
+        <p>ห้ามปิด/เปิดออเดอร์โดยไม่ได้รับอนุมัติ ห้ามบ่ายเบี่ยงคำสั่ง ห้ามระดมทุนโดยไม่ได้รับอนุญาต</p>
+        <h4>๖. การสิ้นสุด</h4>
+        <p>แจ้งล่วงหน้า 30 วัน หรือบอกเลิกทันทีหากฝ่าฝืนข้อกำหนด</p>
+      </div>
+      <div class="tc-chk-row">
+        <input type="checkbox" id="tc-agree-chk" onchange="document.getElementById('tc-submit-btn').disabled=!this.checked">
+        <label for="tc-agree-chk">ข้าพเจ้าได้อ่านและเข้าใจบันทึกข้อตกลงฉบับนี้ทุกประการ และยินยอมผูกพันตามข้อกำหนดทุกข้อ</label>
+      </div>
+      <button class="tc-btn tc-btn-gold" id="tc-submit-btn" onclick="tcSubmit()" disabled>
+        ${isEdit?'💾 บันทึกการแก้ไข':'📨 ยื่นใบสมัคร'}
+      </button>
+      <button class="tc-btn tc-btn-out" onclick="tcBack()">← กลับ</button>
+    </div>
+  </div>`;
+}
+
+function tcUpdatePct(){
+  const m=parseFloat(document.getElementById('tc-members-target')?.value)||0;
+  const v=parseFloat(document.getElementById('tc-volume')?.value)||0;
+  const b=parseFloat(document.getElementById('tc-bonus')?.value)||0;
+  [25,50,75,100].forEach(p=>{
+    const r=p/100;
+    const se=(id,val)=>{const e=document.getElementById(id);if(e)e.textContent=val;};
+    se(`tp-m${p}`,m?Math.round(m*r).toLocaleString():'-');
+    se(`tp-v${p}`,v?Math.round(v*r).toLocaleString():'-');
+    se(`tp-b${p}`,b?Math.round(b*r).toLocaleString():'-');
+  });
+}
+
+async function tcSubmit(){
+  const btn=document.getElementById('tc-submit-btn');
+  const err=document.getElementById('tc-step4-err');
+  const months=parseInt(document.getElementById('tc-months')?.value)||0;
+  const memTgt=parseInt(document.getElementById('tc-members-target')?.value)||0;
+  const volume=parseFloat(document.getElementById('tc-volume')?.value)||0;
+  const bonus=parseFloat(document.getElementById('tc-bonus')?.value)||0;
+  const position=document.getElementById('tc-position')?.value||'';
+  const note=document.getElementById('tc-note')?.value||'';
+  if(!months||!memTgt||!volume){ tcShowErr(err,'กรุณากรอกเป้าหมายระยะเวลา จำนวนสมาชิก และวงเงินเทรด'); return; }
+  if(btn){btn.disabled=true;btn.textContent='⏳ กำลังบันทึก...';}
+  const now=new Date().toISOString();
+  const m=TC.member;
+  const payload={
+    Title:`APP-${memVal(m,'id')}-${Date.now().toString(36).toUpperCase()}`,
+    BNB_ID:memVal(m,'id'), MemberName:memVal(m,'name'), Phone:m['Phone']||'',
+    Team:memVal(m,'team'), TargetMonths:months, TargetMembers:memTgt,
+    TargetVolume:volume, BonusAmount:bonus, DesiredPosition:position,
+    ExtraNote:note, Status:TC.appRow?(TC.appRow.Status||'Pending'):'Pending',
+    PasswordHash:TC.passwordHash,
+    SubmittedAt:TC.appRow?(TC.appRow.SubmittedAt||now):now, UpdatedAt:now,
+  };
+  try{
+    let result;
+    if(TC.appId){
+      const res=await fetch(`${WORKER_URL}/api/noco/${NOCO.tbl.applications}/${TC.appId}`,{
+        method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)
+      });
+      result=await res.json();
+    } else {
+      result=await nocoPost(NOCO.tbl.applications,payload);
+    }
+    TC.appId=result.Id||result.id||TC.appId;
+    TC.appRow={...payload,Id:TC.appId};
+    TC.step=5; tcRender();
+  }catch(e){
+    tcShowErr(err,'เกิดข้อผิดพลาด: '+e.message);
+    if(btn){btn.disabled=false;btn.textContent=TC.appId?'💾 บันทึกการแก้ไข':'📨 ยื่นใบสมัคร';}
+  }
+}
+
+// ── Step 5: สำเร็จ ────────────────────────────────────────────────
+function tcStep5HTML(){
+  const r=TC.appRow||{};
+  return `<div class="tc-flow-wrap">
+    <div class="tc-card">
+      <div class="tc-success-box">
+        <div class="tc-si">🎉</div>
+        <div class="tc-st">${TC.appId&&r.UpdatedAt!==r.SubmittedAt?'บันทึกการแก้ไขเรียบร้อย':'ยื่นใบสมัครเรียบร้อยแล้ว'}</div>
+        <div class="tc-ss">ทีมงานจะตรวจสอบและแจ้งผลผ่านทีมหรือไลน์ของคุณ<br>โดยปกติภายใน 1-3 วันทำการ<br><br>
+          <span style="color:var(--text-dim);font-size:.73rem;">เลขอ้างอิง</span></div>
+        <div class="tc-ref">${r.Title||'APP-'+memVal(TC.member,'id')}</div>
+        <div style="margin-top:10px;">${tcStatusBadge(r.Status||'Pending')}</div>
+        ${r.AdminNote?`<div style="margin-top:10px;padding:8px 14px;background:rgba(255,255,255,.04);border-radius:8px;font-size:.77rem;color:#ccc;">📝 ${r.AdminNote}</div>`:''}
+      </div>
+      <button class="tc-btn tc-btn-out" onclick="tcReset()">↩ ตรวจสอบ/แก้ไขใบสมัครอีกครั้ง</button>
+    </div>
+  </div>`;
+}
+
+function tcReset(){TC.step=1;TC.member=null;TC.appRow=null;TC.appId=null;TC.passwordHash='';tcRender();}
+function tcBack(){TC.step=Math.max(1,TC.step-1);tcRender();}
+function tcShowErr(el,msg){if(el){el.textContent=msg;el.classList.add('on');setTimeout(()=>el.classList.remove('on'),4000);}}
+function tcStatusBadge(st){
+  if(st==='Approved') return '<span class="tc-stat tc-st-appr">✅ อนุมัติแล้ว</span>';
+  if(st==='Rejected') return '<span class="tc-stat tc-st-rejt">❌ ไม่อนุมัติ</span>';
+  if(st==='Editing')  return '<span class="tc-stat tc-st-edit">✏️ แก้ไขข้อมูล</span>';
+  return '<span class="tc-stat tc-st-pend">⏳ รอดำเนินการ</span>';
+}
+
+// ── เรียก render เมื่อ panel termcondition ถูกเปิด ────────────────
+(function(){
+  const _origGo=window.go;
+  window.go=function(id){
+    if(_origGo) _origGo(id);
+    if(id==='termcondition') setTimeout(()=>{if(document.getElementById('tc-app-root'))tcRender();},80);
+  };
+})();
+
+// ════════════════════════════════════════════════════════════════
+//  ADMIN APPLICATIONS TAB
+// ════════════════════════════════════════════════════════════════
+let _APPS=[];
+
+async function loadAdminApps(force){
+  const tbody=document.getElementById('aapp-tbody');
+  if(!tbody) return;
+  if(!force&&_APPS.length){renderAdminApps();return;}
+  tbody.innerHTML='<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--text-dim);">⏳ กำลังโหลด...</td></tr>';
+  try{
+    const rows=await nocoGet(NOCO.tbl.applications,'&sort=-SubmittedAt&limit=500');
+    _APPS=rows||[];
+    renderAdminApps();
+    updateAppStats();
+  }catch(e){
+    tbody.innerHTML=`<tr><td colspan="8" style="text-align:center;padding:24px;color:#f87171;">❌ โหลดไม่สำเร็จ: ${e.message}</td></tr>`;
+  }
+}
+
+function renderAdminApps(){
+  const tbody=document.getElementById('aapp-tbody');
+  const q=(document.getElementById('aapp-q')?.value||'').toLowerCase();
+  const filter=document.getElementById('aapp-filter')?.value||'';
+  if(!tbody) return;
+  const list=_APPS.filter(r=>{
+    const matchQ=!q||(r.BNB_ID||'').toLowerCase().includes(q)||(r.MemberName||'').toLowerCase().includes(q)||(r.Team||'').toLowerCase().includes(q);
+    const matchF=!filter||r.Status===filter;
+    return matchQ&&matchF;
+  });
+  const cnt=document.getElementById('aapp-row-count');
+  if(cnt) cnt.textContent=list.length+' รายการ';
+  if(!list.length){tbody.innerHTML='<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--text-dim);">🔍 ไม่พบข้อมูล</td></tr>';return;}
+  tbody.innerHTML=list.map((r,i)=>{
+    const rowId=r.Id||r.id;
+    const date=(r.SubmittedAt||'—').slice(0,10);
+    const statusOpts=['Pending','Approved','Rejected','Editing'].map(s=>
+      `<option value="${s}" ${(r.Status||'Pending')===s?'selected':''}>${s==='Pending'?'⏳':s==='Approved'?'✅':s==='Rejected'?'❌':'✏️'} ${s}</option>`
+    ).join('');
+    return `<tr style="border-bottom:1px solid rgba(255,255,255,.04);cursor:pointer;" onclick="toggleAppRow(${rowId})">
+      <td style="padding:9px 10px;color:var(--text-dim);">${i+1}</td>
+      <td style="padding:9px 10px;color:var(--gold);font-family:monospace;font-weight:600;">${r.BNB_ID||'—'}</td>
+      <td style="padding:9px 10px;font-weight:500;">${r.MemberName||'—'}</td>
+      <td style="padding:9px 10px;color:#94a3b8;">${r.Team||'—'}</td>
+      <td style="padding:9px 10px;text-align:center;font-size:.74rem;">${r.TargetMonths||'—'}เดือน<br><span style="color:var(--text-dim);">${r.TargetMembers||'—'}คน</span></td>
+      <td style="padding:9px 10px;text-align:center;color:var(--text-dim);font-size:.74rem;">${date}</td>
+      <td style="padding:9px 10px;text-align:center;">
+        <select class="app-status-sel" onchange="adminUpdateAppStatus(${rowId},this.value)" onclick="event.stopPropagation()">${statusOpts}</select>
+      </td>
+      <td style="padding:9px 10px;text-align:center;">
+        <button class="btn btn-outline btn-sm" onclick="event.stopPropagation();openAppDetail(${rowId})">🔍</button>
+      </td>
+    </tr>
+    <tr id="aapp-expand-${rowId}" style="display:none;">
+      <td colspan="8" class="app-row-expand">
+        <b>ตำแหน่ง:</b> ${r.DesiredPosition||'—'} &nbsp;|&nbsp;
+        <b>ค่าบริหาร:</b> ${r.BonusAmount?(+r.BonusAmount).toLocaleString()+'฿':'—'} &nbsp;|&nbsp;
+        <b>วงเงิน:</b> ${r.TargetVolume||'—'} USDT<br>
+        <b>หมายเหตุสมาชิก:</b> ${r.ExtraNote||'—'}<br>
+        <div style="margin-top:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+          <span style="font-size:.74rem;color:var(--text-dim);">AdminNote:</span>
+          <input class="tc-inp" id="anote-${rowId}" value="${(r.AdminNote||'').replace(/"/g,'&quot;')}"
+            placeholder="บันทึกหมายเหตุ..." style="flex:1;max-width:360px;padding:5px 10px;font-size:.75rem;"
+            onclick="event.stopPropagation()">
+          <button class="btn btn-gold btn-sm" onclick="event.stopPropagation();adminSaveNote(${rowId})">💾 บันทึก</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function toggleAppRow(id){
+  const row=document.getElementById(`aapp-expand-${id}`);
+  if(row) row.style.display=row.style.display==='none'?'table-row':'none';
+}
+
+async function adminUpdateAppStatus(rowId,status){
+  try{
+    await fetch(`${WORKER_URL}/api/noco/${NOCO.tbl.applications}/${rowId}`,{
+      method:'PATCH',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({Status:status,UpdatedAt:new Date().toISOString()})
+    });
+    const idx=_APPS.findIndex(r=>(r.Id||r.id)===rowId);
+    if(idx>=0) _APPS[idx].Status=status;
+    updateAppStats();
+    tccNotif('success','อัปเดตสถานะแล้ว','เปลี่ยนเป็น '+status);
+  }catch(e){tccNotif('error','อัปเดตไม่สำเร็จ',e.message);}
+}
+
+async function adminSaveNote(rowId){
+  const inp=document.getElementById(`anote-${rowId}`)||document.getElementById(`anote-modal-${rowId}`);
+  if(!inp) return;
+  try{
+    await fetch(`${WORKER_URL}/api/noco/${NOCO.tbl.applications}/${rowId}`,{
+      method:'PATCH',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({AdminNote:inp.value,UpdatedAt:new Date().toISOString()})
+    });
+    const idx=_APPS.findIndex(r=>(r.Id||r.id)===rowId);
+    if(idx>=0) _APPS[idx].AdminNote=inp.value;
+    tccNotif('success','บันทึกหมายเหตุแล้ว','');
+  }catch(e){tccNotif('error','บันทึกไม่สำเร็จ',e.message);}
+}
+
+function updateAppStats(){
+  const se=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+  se('aapp-total',_APPS.length);
+  se('aapp-pending',_APPS.filter(r=>r.Status==='Pending'||!r.Status).length);
+  se('aapp-approved',_APPS.filter(r=>r.Status==='Approved').length);
+  se('aapp-rejected',_APPS.filter(r=>r.Status==='Rejected').length);
+  se('aapp-editing',_APPS.filter(r=>r.Status==='Editing').length);
+}
+
+function openAppDetail(rowId){
+  const r=_APPS.find(x=>(x.Id||x.id)===rowId);
+  if(!r) return;
+  const modal=document.getElementById('aapp-detail-modal');
+  const content=document.getElementById('aapp-detail-content');
+  if(!modal||!content) return;
+  content.innerHTML=`
+    <div style="font-family:'Rajdhani',sans-serif;font-size:1.05rem;font-weight:700;color:var(--gold);margin-bottom:16px;">📋 รายละเอียดใบสมัคร — ${r.BNB_ID}</div>
+    <div style="display:grid;grid-template-columns:140px 1fr;gap:8px 16px;font-size:.8rem;margin-bottom:14px;">
+      <span style="color:var(--text-dim);">ชื่อ-สกุล</span><span style="font-weight:600;">${r.MemberName||'—'}</span>
+      <span style="color:var(--text-dim);">BNB ID</span><span style="font-family:monospace;color:var(--gold);">${r.BNB_ID||'—'}</span>
+      <span style="color:var(--text-dim);">ทีม</span><span>${r.Team||'—'}</span>
+      <span style="color:var(--text-dim);">เบอร์โทร</span><span>${r.Phone||'—'}</span>
+      <span style="color:var(--text-dim);">ตำแหน่ง</span><span>${r.DesiredPosition||'—'}</span>
+      <span style="color:var(--text-dim);">เป้าหมาย</span><span>${r.TargetMonths||'—'} เดือน | ${r.TargetMembers||'—'} คน | ${r.TargetVolume||'—'} USDT</span>
+      <span style="color:var(--text-dim);">ค่าบริหาร</span><span>${r.BonusAmount?(+r.BonusAmount).toLocaleString()+'฿':'—'}</span>
+      <span style="color:var(--text-dim);">ยื่นวันที่</span><span>${(r.SubmittedAt||'—').slice(0,10)}</span>
+      <span style="color:var(--text-dim);">อัปเดตล่าสุด</span><span>${(r.UpdatedAt||'—').slice(0,10)}</span>
+      <span style="color:var(--text-dim);">สถานะ</span><span>${tcStatusBadge(r.Status||'Pending')}</span>
+    </div>
+    ${r.ExtraNote?`<div style="background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:8px;padding:10px 13px;font-size:.78rem;color:#ccc;margin-bottom:12px;"><b style="color:var(--gold);">หมายเหตุสมาชิก:</b><br>${r.ExtraNote}</div>`:''}
+    <div style="margin-top:10px;">
+      <label style="font-size:.75rem;color:var(--text-dim);margin-bottom:6px;display:block;">เปลี่ยนสถานะ:</label>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;">
+        ${['Pending','Approved','Rejected','Editing'].map(s=>`
+          <button class="btn ${(r.Status||'Pending')===s?'btn-gold':'btn-outline'} btn-sm"
+            onclick="adminUpdateAppStatus(${rowId},'${s}');closeAppDetail()">
+            ${s==='Pending'?'⏳':s==='Approved'?'✅':s==='Rejected'?'❌':'✏️'} ${s}
+          </button>`).join('')}
+      </div>
+      <label style="font-size:.75rem;color:var(--text-dim);margin-bottom:5px;display:block;">AdminNote:</label>
+      <textarea class="tc-inp" id="anote-modal-${rowId}" rows="2" style="font-size:.78rem;">${r.AdminNote||''}</textarea>
+      <button class="btn btn-gold btn-sm" style="margin-top:8px;width:100%;"
+        onclick="adminSaveNote(${rowId});closeAppDetail()">💾 บันทึก AdminNote</button>
+    </div>`;
+  modal.style.display='flex';
+}
+
+function closeAppDetail(){
+  const m=document.getElementById('aapp-detail-modal');
+  if(m) m.style.display='none';
+}
+
+function exportAppsCSV(){
+  if(!_APPS.length){tccNotif('warn','ไม่มีข้อมูล','');return;}
+  const cols=['Title','BNB_ID','MemberName','Phone','Team','TargetMonths','TargetMembers','TargetVolume','BonusAmount','DesiredPosition','Status','AdminNote','SubmittedAt','UpdatedAt'];
+  const rows=[cols.join(',')].concat(_APPS.map(r=>cols.map(c=>`"${(r[c]||'').toString().replace(/"/g,'""')}"`).join(',')));
+  const blob=new Blob(['\uFEFF'+rows.join('\n')],{type:'text/csv;charset=utf-8;'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download=`TCC_Applications_${new Date().toISOString().slice(0,10)}.csv`;a.click();
+}
+// ════ END TC APPLICATION FLOW ════
+
 </script>
-
-
-</body>
-</html>
