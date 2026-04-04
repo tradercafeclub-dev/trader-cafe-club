@@ -10163,8 +10163,8 @@ function _clpInfoCell(label, val, color){
 // ═══════════════════════════════════════════════════
 
 // ─── Constants & State ───
-var IMGBB_KEY_CLM = '2e4d12fafce14b1b3c10c8c72f91a3a7';
-var clmImgs = [];    // [{file,objUrl,uploadedUrl,uploading}]
+// IMGBB_KEY ถูกย้ายไปเก็บใน Cloudflare Worker env (IMGBB_KEY) แล้ว
+var clmImgs = [];    // [{file,objUrl,uploadedUrl,uploading,error}]
 var _clmStep = 1;    // current step: 1,2,3
 
 // ═══════════════════════════════════════════════════════
@@ -10495,18 +10495,27 @@ function clmHandleFiles(files){
   var remain = 20 - clmImgs.length;
   arr.slice(0,remain).forEach(function(f){
     if(!f.type.startsWith('image/')) return;
-    var entry = {file:f, objUrl:URL.createObjectURL(f), uploadedUrl:'', uploading:true};
+    var entry = {file:f, objUrl:URL.createObjectURL(f), uploadedUrl:'', uploading:true, error:false};
     clmImgs.push(entry);
     clmRefreshGrid();
-    var fd = new FormData();
-    fd.append('image', f);
-    fetch('https://api.imgbb.com/1/upload?key='+IMGBB_KEY_CLM, {method:'POST', body:fd})
+    // อ่านเป็น base64 แล้ว upload ผ่าน Worker (IMGBB_KEY ปลอดภัยใน Worker env)
+    var reader = new FileReader();
+    reader.onload = function(ev){
+      var base64 = ev.target.result.replace(/^data:image\/\w+;base64,/, '');
+      fetch(WORKER_URL+'/api/imgbb-upload', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({image: base64})
+      })
       .then(function(r){ return r.json(); })
       .then(function(d){
-        entry.uploadedUrl = (d.data&&d.data.url) ? d.data.url : '';
+        entry.uploadedUrl = d.url || '';
         entry.uploading = false;
+        entry.error = !d.url;
         clmRefreshGrid();
-      }).catch(function(){ entry.uploading=false; clmRefreshGrid(); });
+      }).catch(function(){ entry.uploading=false; entry.error=true; clmRefreshGrid(); });
+    };
+    reader.readAsDataURL(f);
   });
   clmRefreshCount();
 }
@@ -10515,9 +10524,12 @@ function clmRefreshGrid(){
   var grid = document.getElementById('cm-img-grid');
   if(!grid) return;
   grid.innerHTML = clmImgs.map(function(e,i){
+    var overlay = e.uploading
+      ? '<div class="cm-uploading">⏳</div>'
+      : (e.error ? '<div class="cm-uploading" style="background:rgba(239,68,68,.75);">❌</div>' : '<div class="cm-uploading" style="background:rgba(34,197,94,.75);font-size:.6rem;">✅</div>');
     return '<div class="cm-thumb">'
       + '<img src="'+e.objUrl+'" alt="">'
-      + (e.uploading ? '<div class="cm-uploading">⏳</div>' : '')
+      + overlay
       + '<button class="cm-thumb-del" data-idx="'+i+'">✕</button>'
       + '</div>';
   }).join('');
@@ -10699,7 +10711,7 @@ let _ac10View = 'all';
 let _uc10View = 'all';
 let _userClaim10Rows = [];
 
-var C10_IMGBB_KEY = '2e4d12fafce14b1b3c10c8c72f91a3a7';
+// C10_IMGBB_KEY ถูกย้ายไปเก็บใน Cloudflare Worker env (IMGBB_KEY) แล้ว
 var c10Imgs = [];
 var _c10Step = 1;
 
@@ -11427,14 +11439,27 @@ function c10HandleFiles(files){
   var remain = 20 - c10Imgs.length;
   arr.slice(0,remain).forEach(function(f){
     if(!f.type.startsWith('image/')) return;
-    var entry = {file:f, objUrl:URL.createObjectURL(f), uploadedUrl:'', uploading:true};
+    var entry = {file:f, objUrl:URL.createObjectURL(f), uploadedUrl:'', uploading:true, error:false};
     c10Imgs.push(entry);
     c10RefreshGrid();
-    var fd = new FormData(); fd.append('image', f);
-    fetch('https://api.imgbb.com/1/upload?key='+C10_IMGBB_KEY, {method:'POST', body:fd})
+    // อ่านเป็น base64 แล้ว upload ผ่าน Worker (IMGBB_KEY ปลอดภัยใน Worker env)
+    var reader = new FileReader();
+    reader.onload = function(ev){
+      var base64 = ev.target.result.replace(/^data:image\/\w+;base64,/, '');
+      fetch(WORKER_URL+'/api/imgbb-upload', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({image: base64})
+      })
       .then(function(r){ return r.json(); })
-      .then(function(d){ entry.uploadedUrl=(d.data&&d.data.url)?d.data.url:''; entry.uploading=false; c10RefreshGrid(); })
-      .catch(function(){ entry.uploading=false; c10RefreshGrid(); });
+      .then(function(d){
+        entry.uploadedUrl = d.url || '';
+        entry.uploading = false;
+        entry.error = !d.url;
+        c10RefreshGrid();
+      }).catch(function(){ entry.uploading=false; entry.error=true; c10RefreshGrid(); });
+    };
+    reader.readAsDataURL(f);
   });
   c10RefreshCount();
 }
@@ -11442,7 +11467,10 @@ function c10HandleFiles(files){
 function c10RefreshGrid(){
   var grid = document.getElementById('c10-img-grid'); if(!grid) return;
   grid.innerHTML = c10Imgs.map(function(e,i){
-    return '<div class="cm-thumb"><img src="'+e.objUrl+'" alt="">'+(e.uploading?'<div class="cm-uploading">⏳</div>':'')+'<button class="cm-thumb-del" data-idx="'+i+'">✕</button></div>';
+    var overlay = e.uploading
+      ? '<div class="cm-uploading">⏳</div>'
+      : (e.error ? '<div class="cm-uploading" style="background:rgba(239,68,68,.75);">❌</div>' : '<div class="cm-uploading" style="background:rgba(34,197,94,.75);font-size:.6rem;">✅</div>');
+    return '<div class="cm-thumb"><img src="'+e.objUrl+'" alt="">'+overlay+'<button class="cm-thumb-del" data-idx="'+i+'">✕</button></div>';
   }).join('');
   grid.querySelectorAll('.cm-thumb-del').forEach(function(btn){
     btn.addEventListener('click', function(){ c10Imgs.splice(parseInt(this.getAttribute('data-idx')),1); c10RefreshGrid(); c10RefreshCount(); });
@@ -11662,7 +11690,16 @@ function buildDetailHTML(r, type, walletData, loading){
   if(r.Images){
     try{
       const imgs = JSON.parse(r.Images);
-      imgLinks = imgs.map((u,i)=>`<a href="${u}" target="_blank" style="display:inline-block;margin:3px;padding:4px 10px;background:rgba(240,185,11,.1);border:1px solid rgba(240,185,11,.3);border-radius:6px;color:var(--gold);font-size:.72rem;text-decoration:none;">📷 รูปที่ ${i+1}</a>`).join('');
+      if(imgs.length){
+        imgLinks = `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:8px;margin-top:8px;">`
+          + imgs.map((u,i)=>
+            `<a href="${u}" target="_blank" title="รูปที่ ${i+1}" style="display:block;border-radius:8px;overflow:hidden;border:2px solid rgba(240,185,11,.3);transition:border-color .2s;" onmouseover="this.style.borderColor='rgba(240,185,11,.8)'" onmouseout="this.style.borderColor='rgba(240,185,11,.3)'">`
+            +`<img src="${u}" alt="รูปที่ ${i+1}" loading="lazy" style="width:100%;height:80px;object-fit:cover;display:block;" onerror="this.parentElement.style.display='none'">`
+            +`<div style="font-size:.6rem;color:var(--gold);text-align:center;padding:2px 0;background:rgba(0,0,0,.5);">📷 ${i+1}</div>`
+            +`</a>`
+          ).join('')
+          + `</div>`;
+      }
     }catch(e){ imgLinks = r.Images ? `<a href="${r.Images}" target="_blank" style="color:var(--gold);font-size:.72rem;">📷 ดูรูป</a>` : ''; }
   }
 
