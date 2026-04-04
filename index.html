@@ -8028,7 +8028,8 @@ async function refreshRegisterMemberList(){
 function handleImgUpload(input, previewId, thumbId, btnId){
   const file = input.files[0];
   if(!file) return;
-  // ลด resolution ก่อน เพื่อไม่ให้ base64 ใหญ่เกิน
+  // อ่านรูป → compress → เก็บ base64 ไว้ใน data-b64 (สำหรับ upload ไป ImgBB ตอน submit)
+  // thumb.src ใช้แสดง preview เท่านั้น
   const reader = new FileReader();
   reader.onload = e => {
     const img = new Image();
@@ -8043,26 +8044,62 @@ function handleImgUpload(input, previewId, thumbId, btnId){
       canvas.width = w; canvas.height = h;
       canvas.getContext('2d').drawImage(img, 0, 0, w, h);
       const b64 = canvas.toDataURL('image/jpeg', 0.82);
-      const thumb = document.getElementById(thumbId);
+
+      const thumb   = document.getElementById(thumbId);
       const preview = document.getElementById(previewId);
-      const btn = document.getElementById(btnId);
-      if(thumb) thumb.src = b64;
-      if(preview){ preview.style.display='block'; }
-      if(btn) btn.style.borderColor='rgba(3,192,117,0.6)';
+      const btn     = document.getElementById(btnId);
+      if(thumb){
+        thumb.src = b64;             // แสดง preview
+        thumb.dataset.b64 = b64;     // เก็บ base64 ไว้ upload ImgBB ตอน submit
+        thumb.dataset.imgbbUrl = ''; // ล้าง URL เก่า (ถ้ามีการเลือกรูปใหม่)
+      }
+      if(preview) preview.style.display = 'block';
+      if(btn) btn.style.borderColor = 'rgba(3,192,117,0.6)';
     };
     img.src = e.target.result;
   };
   reader.readAsDataURL(file);
 }
+
+// ── Upload base64 รูปไป ImgBB ผ่าน Cloudflare Worker ──
+// Worker จะรับ { image: base64String } แล้ว forward ไป ImgBB API พร้อม API key
+async function uploadToImgBB(thumbId){
+  const thumb = document.getElementById(thumbId);
+  if(!thumb || !thumb.dataset.b64) return '';
+
+  // ถ้าเคย upload แล้ว → ใช้ URL เดิม ไม่ต้อง upload ซ้ำ
+  if(thumb.dataset.imgbbUrl) return thumb.dataset.imgbbUrl;
+
+  // ตัด prefix "data:image/jpeg;base64," ออก เหลือแค่ base64 string
+  const base64Data = thumb.dataset.b64.replace(/^data:image\/\w+;base64,/, '');
+
+  const res = await fetch(`${WORKER_URL}/api/imgbb-upload`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ image: base64Data }),
+  });
+  if(!res.ok){
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || `ImgBB upload failed (${res.status})`);
+  }
+  const data = await res.json();
+  const url  = data.url || '';
+  thumb.dataset.imgbbUrl = url;  // cache ไว้ ไม่ต้อง upload ซ้ำ
+  return url;
+}
 function clearImgUpload(inputId, previewId, thumbId, btnId){
-  const inp = document.getElementById(inputId);
+  const inp   = document.getElementById(inputId);
   const thumb = document.getElementById(thumbId);
   const preview = document.getElementById(previewId);
-  const btn = document.getElementById(btnId);
-  if(inp) inp.value='';
-  if(thumb) thumb.src='';
-  if(preview) preview.style.display='none';
-  if(btn) btn.style.borderColor='rgba(240,185,11,0.35)';
+  const btn   = document.getElementById(btnId);
+  if(inp)   inp.value = '';
+  if(thumb){
+    thumb.src = '';
+    thumb.dataset.b64 = '';       // ล้าง base64
+    thumb.dataset.imgbbUrl = '';  // ล้าง URL cache
+  }
+  if(preview) preview.style.display = 'none';
+  if(btn)   btn.style.borderColor = 'rgba(240,185,11,0.35)';
 }
 // Helper: อ่าน base64 จาก thumb element
 function getImgData(thumbId){
@@ -8171,21 +8208,36 @@ async function submitRegistration(){
   const wallet   = document.getElementById('reg-wallet')?.value?.trim();
   const country  = document.getElementById('reg-country')?.value||'TH';
   const province = document.getElementById('reg-province')?.value?.trim()||'';
-  const binanceB64 = getImgData('binance-thumb');
-  const qrB64      = getImgData('qr-thumb');
 
-  if(!name)      { regNotify('⚠️ กรุณากรอก <span class="notify-field">ชื่อ-สกุล</span>'); return; }
-  if(!bnbid)     { regNotify('⚠️ กรุณากรอก <span class="notify-field">Binance ID</span>'); return; }
-  if(!binanceB64){ regNotify('⚠️ กรุณาอัปโหลด <span class="notify-field">ภาพโปรไฟล์ Binance</span>'); return; }
-  if(!wallet)    { regNotify('⚠️ กรุณากรอก <span class="notify-field">เลขกระเป๋า USDT</span>'); return; }
-  if(!qrB64)     { regNotify('⚠️ กรุณาอัปโหลด <span class="notify-field">รูป QR Code กระเป๋า</span>'); return; }
+  // ตรวจว่ามีรูปถูกเลือกแล้ว (ดูจาก data-b64)
+  const binanceThumb = document.getElementById('binance-thumb');
+  const qrThumb      = document.getElementById('qr-thumb');
+  const hasBinance   = binanceThumb && binanceThumb.dataset.b64;
+  const hasQr        = qrThumb && qrThumb.dataset.b64;
+
+  if(!name)       { regNotify('⚠️ กรุณากรอก <span class="notify-field">ชื่อ-สกุล</span>'); return; }
+  if(!bnbid)      { regNotify('⚠️ กรุณากรอก <span class="notify-field">Binance ID</span>'); return; }
+  if(!hasBinance) { regNotify('⚠️ กรุณาอัปโหลด <span class="notify-field">ภาพโปรไฟล์ Binance</span>'); return; }
+  if(!wallet)     { regNotify('⚠️ กรุณากรอก <span class="notify-field">เลขกระเป๋า USDT</span>'); return; }
+  if(!hasQr)      { regNotify('⚠️ กรุณาอัปโหลด <span class="notify-field">รูป QR Code กระเป๋า</span>'); return; }
 
   const btn = document.querySelector('[onclick="submitRegistration()"]');
-  if(btn){ btn.textContent='⏳ กำลังเตรียมระบบ...'; btn.disabled=true; }
+  if(btn){ btn.textContent='⏳ กำลังอัปโหลดรูปภาพ...'; btn.disabled=true; }
   const resEl = document.getElementById('reg-result');
 
   try{
-    // ตรวจสอบและสร้าง columns ที่ขาดหายไปก่อน insert
+    // ── Step 1: Upload รูปทั้งสอง ไป ImgBB ผ่าน Worker ──
+    regNotify('⏳ กำลังอัปโหลดภาพโปรไฟล์ Binance...', 'info');
+    const binanceUrl = await uploadToImgBB('binance-thumb');
+    if(!binanceUrl) throw new Error('ไม่สามารถอัปโหลดภาพโปรไฟล์ Binance ได้');
+
+    regNotify('⏳ กำลังอัปโหลด QR Code...', 'info');
+    const qrUrl = await uploadToImgBB('qr-thumb');
+    if(!qrUrl) throw new Error('ไม่สามารถอัปโหลด QR Code ได้');
+
+    regNotifyClear();
+
+    // ── Step 2: Insert ข้อมูล + URL รูป ลง Google Sheets ──
     await ensureMembersColumns();
     if(btn) btn.textContent='⏳ กำลังบันทึก...';
     await ndbInsert('members', {
@@ -8193,9 +8245,9 @@ async function submitRegistration(){
       'Name'           : name,
       'Phone'          : phone,
       'Team'           : team,
-      'Binance_IMG'    : binanceB64,
+      'Binance_IMG'    : binanceUrl,   // ← URL จาก ImgBB (ไม่ใช่ base64)
       'Address Wallet' : wallet,
-      'QR Code'        : qrB64,
+      'QR Code'        : qrUrl,        // ← URL จาก ImgBB (ไม่ใช่ base64)
       'Country'        : country,
       'Province'       : province,
       'Status'         : 'Pending',
@@ -13287,5 +13339,4 @@ function exportAppsCSV(){
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`TCC_Applications_${new Date().toISOString().slice(0,10)}.csv`;a.click();
 }
 // ════ END TC APPLICATION FLOW v4 ════
--e 
 </script>
