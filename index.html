@@ -1838,6 +1838,7 @@ async function initClaimTables(){
       if(t.cafecards)   { NOCO.tbl.cafe         = t.cafecards;   }
       if(t.cafeshops)   { NOCO.tbl.cafeshops    = t.cafeshops;   localStorage.setItem('tcc_cafeshops_id',   t.cafeshops);   }
       if(t.pagecontent) { NOCO.tbl.pagecontent  = t.pagecontent; localStorage.setItem('tcc_pagecontent_id', t.pagecontent); }
+      if(t.applications) { NOCO.tbl.applications = t.applications; }
       console.log('✅ Table IDs loaded from Worker config');
     }
   }catch(e){
@@ -6248,8 +6249,7 @@ async function ndbFetchAll(table,params={}){
     offset+=PAGE_SIZE;
     // Safety cap: max 20 pages = 2000 records
     if(totalPages>=20) break;
-    // ── หน่วงเล็กน้อยระหว่างหน้า ป้องกัน 429 จาก pagination ชนกัน ──
-    await new Promise(r=>setTimeout(r,250));
+    // [FIX] ลบ delay 250ms ออก — Google Sheets ไม่มีปัญหา 429 เหมือน NocoDB
   }
   return allRecords;
 }
@@ -9623,10 +9623,8 @@ function go(id){
 async function loadMainData(){
   showLoading('กำลังโหลดข้อมูล...');
   try{
-    // ── โหลดทีละตัว (sequential) ป้องกัน 429 จาก concurrent requests ──
-    await loadMembers();
-    await loadTeams();
-    await loadPayments();
+    // [FIX] โหลด parallel แทน sequential — Google Sheets ไม่มีปัญหา 429 เหมือน NocoDB
+    await Promise.all([loadMembers(), loadTeams(), loadPayments()]);
     hideLoading();
     const el=document.getElementById('hconn');
     if(el){el.textContent='✅Binance Data Connected';el.className='hconn ok';}
@@ -9673,12 +9671,13 @@ go(initId);
 // หมายเหตุ: initClaimTables ถูกเรียกแล้วตอน init() เริ่มต้น
 // setTimeout ด้านล่างเป็น retry/refresh รอบที่ 2 เท่านั้น
 // ── เลื่อนเวลาให้ loadMainData (members+teams+payments) โหลดเสร็จก่อน ป้องกัน 429 ──
-setTimeout(testConn, 8000);
-setTimeout(()=>{ ensureMembersColumns().catch(e=>console.warn('ensureMembersColumns:',e)); }, 10000);
-setTimeout(()=>{ initNocoItems().catch(e=>console.warn('initNocoItems:',e)); }, 12000);
-setTimeout(()=>{ initCafeCards().catch(e=>console.warn('initCafeCards:',e)); }, 15000);
-setTimeout(()=>{ initPageContent().catch(e=>console.warn('initPageContent:',e)); }, 2000);
-setTimeout(initClaimTables, 30000); // refresh IDs ทุก 30s (fallback)
+// [FIX] ลด delay ที่ไม่จำเป็น — Google Sheets ตอบสนองเร็วกว่า NocoDB
+setTimeout(testConn, 3000);
+setTimeout(()=>{ ensureMembersColumns().catch(e=>console.warn('ensureMembersColumns:',e)); }, 5000);
+setTimeout(()=>{ initNocoItems().catch(e=>console.warn('initNocoItems:',e)); }, 6000);
+setTimeout(()=>{ initCafeCards().catch(e=>console.warn('initCafeCards:',e)); }, 7000);
+setTimeout(()=>{ initPageContent().catch(e=>console.warn('initPageContent:',e)); }, 1500);
+setTimeout(initClaimTables, 30000);
 
 // ═══════════════════════════════════════════════════
 //  Claim LP — ตาราง + Admin Approve
@@ -12817,9 +12816,13 @@ function tcS2go(){
   const inp=document.getElementById('tc-phone'),err=document.getElementById('tc-e2');if(!inp)return;
   const v=inp.value.trim().replace(/[^0-9]/g,'');
   if(!v||v.length<9){tcErr(err,'กรุณากรอกเบอร์โทรให้ถูกต้อง');return;}
-  const stored=(TC.member['Phone']||'').replace(/[^0-9]/g,'');
+  // [FIX] normalize ทั้งสองฝั่ง: ตัดศูนย์นำหน้าออก
+  // แก้ปัญหา Google Sheets เก็บเบอร์เป็นตัวเลข (924425518) ≠ ที่ user พิมพ์ (0924425518)
+  const normPhone = s => (s||'').replace(/[^0-9]/g,'').replace(/^0+/,'');
+  const stored = normPhone(TC.member['Phone']||'');
+  const entered = normPhone(v);
   if(!stored){tcErr(err,'ไม่พบเบอร์โทรในระบบ กรุณาติดต่อแอดมิน');return;}
-  if(v!==stored){tcErr(err,'เบอร์โทรไม่ตรงกับที่ลงทะเบียนไว้');return;}
+  if(!entered||entered!==stored){tcErr(err,'เบอร์โทรไม่ตรงกับที่ลงทะเบียนไว้');return;}
   TC.step=3;tcRender();
 }
 
@@ -13284,4 +13287,5 @@ function exportAppsCSV(){
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`TCC_Applications_${new Date().toISOString().slice(0,10)}.csv`;a.click();
 }
 // ════ END TC APPLICATION FLOW v4 ════
+-e 
 </script>
