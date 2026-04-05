@@ -388,7 +388,7 @@
     <div class="error-msg" id="error-msg" style="color:#94a3b8;font-size:0.82rem;line-height:1.7;margin-bottom:20px;">ลิงก์นี้อาจหมดอายุหรือไม่ถูกต้อง กรุณาติดต่อแอดมิน</div>
     <div style="background:rgba(240,185,11,0.06);border:1px solid rgba(240,185,11,0.2);border-radius:10px;padding:12px 16px;">
       <div style="font-size:0.68rem;color:#f0b90b;font-weight:600;letter-spacing:1px;margin-bottom:4px;">ℹ️ SECURE SHARE LINK</div>
-      <div style="font-size:0.72rem;color:#64748b;line-height:1.6;">ลิงก์แชร์มีอายุ 48 ชั่วโมง และสร้างได้เฉพาะแอดมินเท่านั้น<br>เพื่อความปลอดภัยของข้อมูล</div>
+      <div style="font-size:0.72rem;color:#64748b;line-height:1.6;">ลิงก์แชร์มีอายุ 7 วัน และสร้างได้เฉพาะแอดมินเท่านั้น<br>เพื่อความปลอดภัยของข้อมูล</div>
     </div>
   </div>
 </div>
@@ -403,7 +403,7 @@
 // ── Config ──
 // [FIX] ลบ NOCO token ออกจาก client ทั้งหมด
 // ข้อมูลทุกอย่างดึงผ่าน Worker proxy แทน — token อยู่ฝั่ง server เท่านั้น
-const WORKER_URL = 'https://tcc-proxy.tradercafeclub.workers.dev';
+const WORKER_URL = 'https://tradercafeclub.tradercafeclub.workers.dev';
 const SYSTEM_WALLET = {
   label: 'กระเป๋าหลัก',
   addr:  '0xfd1A5bc82603a702a9AF38426FfAC0d6BE5aEeef',
@@ -718,7 +718,7 @@ async function main() {
       const vd = await verifyRes.json().catch(() => ({}));
       const reason = vd.error || 'ลิงก์ไม่ถูกต้อง';
       if (reason.includes('expired') || reason.includes('Expired')) {
-        showError('ลิงก์นี้หมดอายุแล้ว (48 ชั่วโมง) กรุณาติดต่อแอดมินเพื่อขอลิงก์ใหม่');
+        showError('ลิงก์นี้หมดอายุแล้ว (มีกำหนด 7 วัน กรุณาติดต่อแอดมินเพื่อขอลิงก์ใหม่');
       } else {
         showError(`ลิงก์ไม่ถูกต้องหรือถูกแก้ไข (${reason}) กรุณาติดต่อแอดมิน`);
       }
