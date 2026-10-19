@@ -2374,7 +2374,7 @@ input[type=number].tc-inp::-webkit-inner-spin-button{-webkit-appearance:none;mar
         <div style="font-size:0.63rem;color:var(--text-dim);margin-top:1px;">PAYMENT REPORT · Secure View</div>
       </div>
     </div>
-    <button id="sv-close-btn" onclick="document.getElementById('sv-overlay').classList.remove('open');try{sessionStorage.removeItem('_tcc_sv_open');}catch(e){}history.replaceState(null,'',window.location.pathname+window.location.hash);" style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#94a3b8;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">✕</button>
+    <button id="sv-close-btn" onclick="document.getElementById('sv-overlay').classList.remove('open');try{sessionStorage.removeItem('_tcc_sv_open');}catch(e){}try{history.replaceState(null,'',window.location.pathname+window.location.hash);}catch(e){}" style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#94a3b8;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">✕</button>
   </div>
   <div class="sv-body" id="sv-body">
     <div style="text-align:center;padding:60px 20px;color:var(--text-dim);">⏳ กำลังโหลด...</div>
@@ -3117,7 +3117,7 @@ let currentMemberPayments=[], selectedAdminMember=null, tradeRows=[];
 // ═══ SESSION CACHE — ข้อมูลไม่หายเมื่อ Refresh ═══
 const SS_MEMBERS='tcc_ss_members', SS_TEAMS='tcc_ss_teams', SS_PAYMENTS='tcc_ss_payments';
 const SS_TTL = 10 * 60 * 1000; // 10 นาที
-function ssSet(k,d){try{sessionStorage.setItem(k,JSON.stringify({d,t:Date.now()}));}catch(e){}}
+function ssSet(k,d){try{sessionStorage.setItem(k,JSON.stringify({d,t:Date.now()}));}catch(e){try{sessionStorage.removeItem(k);}catch(_){} console.warn('[cache] sessionStorage เต็ม/ใช้ไม่ได้ — ข้าม cache ของ',k,'(ระบบยังทำงานปกติ แต่จะโหลดใหม่ทุกครั้ง)');}}
 function ssGet(k){try{const r=sessionStorage.getItem(k);if(!r)return null;const o=JSON.parse(r);if(Date.now()-o.t>SS_TTL){sessionStorage.removeItem(k);return null;}return o.d;}catch(e){return null;}}
 function ssClear(k){try{if(k)sessionStorage.removeItem(k);else[SS_MEMBERS,SS_TEAMS,SS_PAYMENTS].forEach(x=>sessionStorage.removeItem(x));}catch(e){}}
 function applyDashboardStats(){
@@ -3140,7 +3140,10 @@ let commApprovals={};
 const COMM_APPROVALS_KEY='tcc_comm_approvals';
 let currentPage_main='home';
 let pexPage=0;
-const PEX_PAGE_SIZE=20;
+const PEX_PAGE_SIZE=50;
+const PEX_BROWSE_CAP=100; // ไม่ค้นหา/กรอง = แสดงแค่ 100 รายการล่าสุด ที่เหลือใช้ค้นหา
+let SUMMARY=null; // สรุปยอดรวมจาก Worker (/api/payments/summary) ครอบคลุมทุกแถว
+let PEX_RESULT={list:[],total:0,stats:null}; let _pexSeq=0, _pexTimer=null;
 let pexSearchText='', pexTypeFilter='all', pexStatusFilter='', pexMonthFilter='', pexTimeMode='all';
 
 const COINS=['Gold','BTC','ETH','XRP','SOL','BNB','ADA','DOGE','MATIC','LINK','DOT','AVAX','LTC','TRX'];
@@ -4849,19 +4852,21 @@ function switchSysTab(tabId){
 }
 
 function buildSystemPaymentStats(){
-  const pending=PAYMENTS.filter(p=>payVal(p,'position')==='Pending').length;
-  const total=PAYMENTS.reduce((s,p)=>s+payNum(p,'profit'),0);
+  const S=SUMMARY;
+  const pending=S?S.pending:PAYMENTS.filter(p=>payVal(p,'position')==='Pending').length;
+  const total=S?S.totalProfit:PAYMENTS.reduce((s,p)=>s+payNum(p,'profit'),0);
+  const nMem=S?S.members:MEMBERS.length, nTeam=S?S.teams:TEAMS.length, nPay=S?S.payments:PAYMENTS.length;
   // Update System panel stats (sys-sub-home)
   const sa=v=>{document.querySelectorAll(`[id="${v[0]}"]`).forEach(e=>e.textContent=v[1]);};
-  sa(['stat-members',MEMBERS.length]);
-  sa(['stat-teams',TEAMS.length]);
-  sa(['stat-payments',PAYMENTS.length]);
+  sa(['stat-members',nMem]);
+  sa(['stat-teams',nTeam]);
+  sa(['stat-payments',nPay]);
   sa(['stat-pending',pending]);
   sa(['stat-total-profit',fmtUSD(total)]);
   // Update Payment panel stats (pmt- prefixed)
-  document.querySelectorAll('[id="pmt-stat-members"]').forEach(e=>e.textContent=MEMBERS.length);
-  document.querySelectorAll('[id="pmt-stat-teams"]').forEach(e=>e.textContent=TEAMS.length);
-  document.querySelectorAll('[id="pmt-stat-payments"]').forEach(e=>e.textContent=PAYMENTS.length);
+  document.querySelectorAll('[id="pmt-stat-members"]').forEach(e=>e.textContent=nMem);
+  document.querySelectorAll('[id="pmt-stat-teams"]').forEach(e=>e.textContent=nTeam);
+  document.querySelectorAll('[id="pmt-stat-payments"]').forEach(e=>e.textContent=nPay);
   document.querySelectorAll('[id="pmt-stat-pending"]').forEach(e=>e.textContent=pending);
   document.querySelectorAll('[id="pmt-stat-total-profit"]').forEach(e=>e.textContent=fmtUSD(total));
 }
@@ -8021,7 +8026,8 @@ async function ndbFetch(table,params={},_retry=0){
 
 // Fetch ALL records by paginating until no more data
 async function ndbFetchAll(table,params={}){
-  const PAGE_SIZE=100;
+  const PAGE_SIZE=params.pageSize||100;
+  params={...params}; delete params.pageSize;
   let allRecords=[];
   let offset=0;
   let totalPages=0;
@@ -8037,8 +8043,8 @@ async function ndbFetchAll(table,params={}){
       break;
     }
     offset+=PAGE_SIZE;
-    // Safety cap: max 20 pages = 2000 records
-    if(totalPages>=20) break;
+    // Safety cap: 100 pages (ไม่จำกัดที่ 2000 แถวอีกต่อไป — ตัดตอนด้วย pageSize 1000 = สูงสุด 100,000 แถว)
+    if(totalPages>=100) break;
     // [FIX] ลบ delay 250ms ออก — Google Sheets ไม่มีปัญหา 429 เหมือน NocoDB
   }
   return allRecords;
@@ -8429,37 +8435,53 @@ async function loadTeams(force=false){
   setAllById('stat-teams',TEAMS.length);
   renderTeams(); renderAdminTeams&&renderAdminTeams();
 }
+async function loadSummary(){
+  try{
+    const r=await fetch(`${WORKER_URL}/api/payments/summary`);
+    if(r.ok){const d=await r.json(); if(d&&d.ok){SUMMARY=d; ssSet('tcc_ss_summary',d);}}
+  }catch(e){console.warn('summary',e);}
+}
+function _applySummaryStats(){
+  const S=SUMMARY;
+  const total=S?S.totalProfit:PAYMENTS.reduce((s,p)=>s+payNum(p,'profit'),0);
+  const pending=S?S.pending:PAYMENTS.filter(p=>payVal(p,'position')==='Pending').length;
+  setAllById('stat-payments',S?S.payments:PAYMENTS.length); setAllById('stat-pending',pending); setAllById('stat-total-profit',fmtUSD(total));
+}
+// 1) ดึง "สรุปยอดรวม" จาก Worker ก่อน → การ์ดแสดงยอดครบทันที (ไม่รอข้อมูลทั้งชุด)
+// 2) แล้วโหลด PAYMENTS ครบทุกแถว (ไม่จำกัด 2000) ไว้ให้ค่าคอม/ทีม/Dashboard สมาชิกใช้คำนวณ
+// 3) ลิสต์ในหน้า Payment แสดงตามผลค้นหาจาก Worker (pexRender) ไม่ได้อาศัย PAYMENTS
 async function loadPayments(force=false){
   if(!force){
-    const c=ssGet(SS_PAYMENTS);
+    const c=ssGet(SS_PAYMENTS), cs=ssGet('tcc_ss_summary');
     if(c){
-      PAYMENTS=c;
-      const total=PAYMENTS.reduce((s,p)=>s+payNum(p,'profit'),0);
-      const pending=PAYMENTS.filter(p=>payVal(p,'position')==='Pending').length;
-      setAllById('stat-payments',PAYMENTS.length); setAllById('stat-pending',pending); setAllById('stat-total-profit',fmtUSD(total));
+      PAYMENTS=c; if(cs)SUMMARY=cs;
+      _applySummaryStats();
       renderRecentPayments&&renderRecentPayments(); renderAdminPayments&&renderAdminPayments(); updateAdminStats();
-      buildSystemPaymentStats&&buildSystemPaymentStats(); // ── อัปเดต pmt-stat-* (cache path)
+      buildSystemPaymentStats&&buildSystemPaymentStats();
+      if(!cs) loadSummary().then(()=>{_applySummaryStats();buildSystemPaymentStats&&buildSystemPaymentStats();updateAdminStats();});
       return;
     }
   }
   document.querySelectorAll('#pex-list').forEach(listEl=>{
-    listEl.innerHTML=`<div style="text-align:center;padding:30px;color:var(--muted);"><div style="font-size:1.5rem;margin-bottom:8px;">⏳</div><div style="font-size:0.85rem;">กำลังดึงข้อมูลทั้งหมดจากฐานข้อมูล...</div></div>`;
+    listEl.innerHTML=`<div style="text-align:center;padding:30px;color:var(--muted);"><div style="font-size:1.5rem;margin-bottom:8px;">⏳</div><div style="font-size:0.85rem;">กำลังดึงข้อมูล...</div></div>`;
   });
-  const records=await ndbFetchAll('payments',{sort:'-Id'});
+  await loadSummary();
+  _applySummaryStats(); buildSystemPaymentStats&&buildSystemPaymentStats(); updateAdminStats();
+  pexRender&&pexRender(); // แสดงลิสต์/ค้นหาจาก Worker ได้ทันที
+  const records=await ndbFetchAll('payments',{sort:'-Id',pageSize:1000});
   PAYMENTS=records; ssSet(SS_PAYMENTS,records);
-  const total=PAYMENTS.reduce((s,p)=>s+payNum(p,'profit'),0);
-  const pending=PAYMENTS.filter(p=>payVal(p,'position')==='Pending').length;
-  setAllById('stat-payments',PAYMENTS.length); setAllById('stat-pending',pending); setAllById('stat-total-profit',fmtUSD(total));
+  _applySummaryStats();
   renderRecentPayments&&renderRecentPayments(); renderAdminPayments&&renderAdminPayments(); updateAdminStats();
-  buildSystemPaymentStats&&buildSystemPaymentStats(); // ── อัปเดต pmt-stat-* (API path)
+  buildSystemPaymentStats&&buildSystemPaymentStats();
 }
 function updateAdminStats(){
-  const total=PAYMENTS.reduce((s,p)=>s+payNum(p,'profit'),0);
-  const pending=PAYMENTS.filter(p=>payVal(p,'position')==='Pending').length;
+  const S=SUMMARY;
+  const total=S?S.totalProfit:PAYMENTS.reduce((s,p)=>s+payNum(p,'profit'),0);
+  const pending=S?S.pending:PAYMENTS.filter(p=>payVal(p,'position')==='Pending').length;
   const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
-  set('a-stat-members',MEMBERS.length);
-  set('a-stat-teams',TEAMS.length);
-  set('a-stat-pays',PAYMENTS.length);
+  set('a-stat-members',S?S.members:MEMBERS.length);
+  set('a-stat-teams',S?S.teams:TEAMS.length);
+  set('a-stat-pays',S?S.payments:PAYMENTS.length);
   set('a-stat-pending',pending);
   set('a-stat-profit',fmtUSD(total));
 }
@@ -8474,17 +8496,21 @@ function renderRecentPayments(){
 
 function pexBuildMonthFilter(){
   const sel = document.getElementById('pex-month-filter');
-  if(!sel||!PAYMENTS.length) return;
+  if(!sel) return;
   const months = {};
-  PAYMENTS.forEach(p=>{
+  if(SUMMARY&&SUMMARY.months) SUMMARY.months.forEach(k=>months[k]=true);
+  else PAYMENTS.forEach(p=>{
     const d = parsePayDate(payVal(p,'date'));
     if(d) months[`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`]=true;
   });
+  const cur = sel.value;
   const sorted = Object.keys(months).sort().reverse();
+  if(!sorted.length) return;
   sel.innerHTML = '<option value="">— เลือกเดือน —</option>' + sorted.map(k=>{
     const [y,m] = k.split('-');
     return `<option value="${k}">${getThaiMonth(parseInt(m))} ${parseInt(y)+543}</option>`;
   }).join('');
+  sel.value = cur;
 }
 
 // ── โหมดหลัก: all / team / lva / lvb ──
@@ -8536,7 +8562,8 @@ function pexOnSearchInput(val){
   const clearBtn = document.getElementById('pex-clear-btn');
   if(clearBtn) clearBtn.classList.toggle('show', val.length > 0);
   pexPage = 0;
-  pexRender();
+  clearTimeout(_pexTimer);
+  _pexTimer = setTimeout(pexRender, 300);
 }
 
 function pexClearSearch(){
@@ -8556,88 +8583,48 @@ function pexSearch(){
   pexRender();
 }
 
-// ── filter function: คืน array ที่ผ่านเงื่อนไขทั้งหมด + เรียงใหม่→เก่า ──
-function pexFilter(){
-  const q = pexSearchText;
-  let result = PAYMENTS.filter(p=>{
-    // ── text search ตาม mode ──
-    if(q){
-      const name  = payVal(p,'name').toLowerCase();
-      const uid   = payVal(p,'bnb_id').toLowerCase();
-      const team  = payVal(p,'team').toLowerCase();
-      const lva   = payVal(p,'lva').toLowerCase();
-      const lvb   = payVal(p,'lvb').toLowerCase();
-
-      if(pexTypeFilter==='all'){
-        // ทั้งหมด: ค้นหาจากทุก field
-        if(!name.includes(q)&&!uid.includes(q)&&!team.includes(q)&&!lva.includes(q)&&!lvb.includes(q)) return false;
-      } else if(pexTypeFilter==='team'){
-        // โหมดทีม: ค้นหาเฉพาะ field team
-        if(!team.includes(q) && !name.includes(q) && !uid.includes(q)) return false;
-      } else if(pexTypeFilter==='lva'){
-        // โหมด Level A: ค้นหาเฉพาะ field lva
-        if(!lva.includes(q) && !name.includes(q) && !uid.includes(q)) return false;
-      } else if(pexTypeFilter==='lvb'){
-        // โหมด Level B: ค้นหาเฉพาะ field lvb
-        if(!lvb.includes(q) && !name.includes(q) && !uid.includes(q)) return false;
-      }
-    }
-
-    // ── mode filter: กรองตาม field ของ mode นั้นต้องมีค่า และตรงกับ q ──
-    if(pexTypeFilter==='team'){
-      // ต้องสังกัดทีมนั้น (team field ต้องตรง)
-      if(!payVal(p,'team')) return false;
-      if(q && !payVal(p,'team').toLowerCase().includes(q) &&
-              !payVal(p,'name').toLowerCase().includes(q) &&
-              !payVal(p,'bnb_id').toLowerCase().includes(q)) return false;
-    }
-    if(pexTypeFilter==='lva'){
-      if(!payVal(p,'lva')) return false;
-      if(q && !payVal(p,'lva').toLowerCase().includes(q) &&
-              !payVal(p,'name').toLowerCase().includes(q) &&
-              !payVal(p,'bnb_id').toLowerCase().includes(q)) return false;
-    }
-    if(pexTypeFilter==='lvb'){
-      if(!payVal(p,'lvb')) return false;
-      if(q && !payVal(p,'lvb').toLowerCase().includes(q) &&
-              !payVal(p,'name').toLowerCase().includes(q) &&
-              !payVal(p,'bnb_id').toLowerCase().includes(q)) return false;
-    }
-
-    // status filter
-    if(pexStatusFilter==='approve' && payVal(p,'position')!=='Approve') return false;
-    if(pexStatusFilter==='pending' && payVal(p,'position')==='Approve') return false;
-    // month filter
-    if(pexMonthFilter){
-      const d = parsePayDate(payVal(p,'date'));
-      if(!d) return false;
-      const mk = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
-      if(mk !== pexMonthFilter) return false;
-    }
-    return true;
+// ── ดึงผลลัพธ์จาก Worker (ค้นหา/กรอง/แบ่งหน้าฝั่ง Server) ──
+function pexHasFilter(){return !!(pexSearchText||pexTypeFilter!=='all'||pexStatusFilter||pexMonthFilter);}
+async function pexRender(){
+  const seq=++_pexSeq;
+  const hasF=pexHasFilter();
+  const qs=new URLSearchParams({
+    q:pexSearchText, mode:pexTypeFilter, status:pexStatusFilter, month:pexMonthFilter,
+    limit:PEX_PAGE_SIZE, offset:pexPage*PEX_PAGE_SIZE
   });
-
-  // เรียงจากใหม่ → เก่า (วันที่ทำรายการ)
-  result.sort((a,b)=>{
-    const da = parsePayDate(payVal(a,'date'));
-    const db = parsePayDate(payVal(b,'date'));
-    if(!da&&!db) return 0;
-    if(!da) return 1;
-    if(!db) return -1;
-    return db - da;
-  });
-  return result;
+  const listEl=document.getElementById('pex-list');
+  if(listEl&&hasF&&!PEX_RESULT.list.length) listEl.innerHTML='<div class="pex-empty"><div class="pex-empty-icon">⏳</div><div style="font-size:0.82rem;">กำลังค้นหา...</div></div>';
+  try{
+    const r=await fetch(`${WORKER_URL}/api/payments/query?${qs}`);
+    if(!r.ok) throw new Error('API '+r.status);
+    const d=await r.json();
+    if(seq!==_pexSeq) return; // มีคำค้นใหม่กว่า
+    PEX_RESULT={list:d.list||[],total:(d.pageInfo&&d.pageInfo.totalRows)||0,stats:d.stats||null,capped:false};
+  }catch(e){
+    if(seq!==_pexSeq) return;
+    PEX_RESULT={list:PAYMENTS.slice(pexPage*PEX_PAGE_SIZE,(pexPage+1)*PEX_PAGE_SIZE),total:PAYMENTS.length,stats:null,capped:false};
+  }
+  // ไม่ได้ค้นหา/กรอง: แสดงแค่ PEX_BROWSE_CAP รายการล่าสุด
+  if(!hasF){
+    PEX_RESULT.capped=PEX_RESULT.total>PEX_BROWSE_CAP;
+    PEX_RESULT.fullTotal=PEX_RESULT.total;
+    PEX_RESULT.total=Math.min(PEX_RESULT.total,PEX_BROWSE_CAP);
+    PEX_RESULT.list=PEX_RESULT.list.slice(0,Math.max(0,PEX_RESULT.total-pexPage*PEX_PAGE_SIZE));
+  }
+  pexDraw();
 }
 
-function pexRender(){
+function pexDraw(){
   const fmtD = v=>'$'+v.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2});
-  const filtered = pexFilter();
+  const R=PEX_RESULT, filtered={length:R.total};
 
   // ── คำนวณ Summary stats จากผลการค้นหา ──
-  const totalProfit   = filtered.reduce((s,p)=>s+payNum(p,'profit'),0);
-  const totalMember   = filtered.reduce((s,p)=>s+payNum(p,'member'),0);
-  const totalGuaranee = filtered.reduce((s,p)=>s+payNum(p,'guarantee'),0);
-  const uniqueMembers = new Set(filtered.map(p=>payVal(p,'bnb_id'))).size;
+  const hasF=pexHasFilter();
+  const S2=(hasF&&R.stats)?R.stats:null;
+  const totalProfit   = S2?S2.profit   :R.list.reduce((s,p)=>s+payNum(p,'profit'),0);
+  const totalMember   = S2?S2.member   :R.list.reduce((s,p)=>s+payNum(p,'member'),0);
+  const totalGuaranee = S2?S2.guarantee:R.list.reduce((s,p)=>s+payNum(p,'guarantee'),0);
+  const uniqueMembers = S2?S2.unique   :new Set(R.list.map(p=>payVal(p,'bnb_id'))).size;
 
   const setEl=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
   setEl('pex-s-count',   filtered.length);
@@ -8645,7 +8632,7 @@ function pexRender(){
   setEl('pex-s-profit',  fmtD(totalProfit));
   setEl('pex-s-members', fmtD(totalMember));
   setEl('pex-s-guar',    fmtD(totalGuaranee));
-  setEl('pex-result-count', `${filtered.length} รายการ`);
+  setEl('pex-result-count', R.capped?`${filtered.length} รายการล่าสุด (จากทั้งหมด ${R.fullTotal}) — ใช้ช่องค้นหาเพื่อดูรายการอื่น`:`${filtered.length} รายการ`);
 
   // ── Active filter chips ──
   const tagsEl = document.getElementById('pex-active-filters');
@@ -8671,7 +8658,7 @@ function pexRender(){
   // ── Pagination ──
   const totalPages = Math.max(1, Math.ceil(filtered.length/PEX_PAGE_SIZE));
   if(pexPage >= totalPages) pexPage = totalPages-1;
-  const pageData = filtered.slice(pexPage*PEX_PAGE_SIZE, (pexPage+1)*PEX_PAGE_SIZE);
+  const pageData = R.list;
 
   // ── List render ──
   const listEl = document.getElementById('pex-list');
@@ -8741,7 +8728,7 @@ function pexRender(){
   // ── Pagination buttons ──
   const pgEl = document.getElementById('pex-pagination');
   if(!pgEl) return;
-  if(totalPages<=1){pgEl.innerHTML='';return;}
+  if(totalPages<=1){pgEl.innerHTML=R.capped?`<span class="pex-page-info">แสดง ${filtered.length} รายการล่าสุด จากทั้งหมด ${R.fullTotal} — ใช้ช่องค้นหาเพื่อดูรายการอื่น</span>`:'';return;}
 
   function pgBtn(idx, label, active=false, disabled=false){
     if(disabled) return `<button class="pex-page-btn" disabled>${label}</button>`;
@@ -8762,7 +8749,7 @@ function pexRender(){
     prev=pg;
   }
   pgHtml += pgBtn(pexPage+1,'›',false,pexPage>=totalPages-1);
-  pgHtml += `<span class="pex-page-info">(${filtered.length} รายการ)</span>`;
+  pgHtml += `<span class="pex-page-info">(${filtered.length} รายการ${R.capped?' ล่าสุด':''})</span>`;
   pgEl.innerHTML = pgHtml;
 }
 
@@ -9666,7 +9653,7 @@ async function approvePayment(rowId,btnEl){
 
 // ═══════════════ PAYMENT DETAIL MODAL ═══════════════
 function showPaymentDetail(rowId){
-  const p=PAYMENTS.find(x=>String(x.Id)===String(rowId));
+  const p=PAYMENTS.find(x=>String(x.Id)===String(rowId))||PEX_RESULT.list.find(x=>String(x.Id)===String(rowId));
   if(!p)return;
   const now=new Date();
   const profit=payNum(p,'profit'),comm=payNum(p,'commission'),guar=payNum(p,'guarantee');
@@ -11228,7 +11215,7 @@ function handleHash(){
       var _openPayModal = function(){
         showPaymentDetail(rowId);
         // เปลี่ยน URL เป็น #payment หลังเปิด modal (ป้องกัน reload ซ้ำ)
-        history.replaceState(null,'','#payment');
+        try{history.replaceState(null,'','#payment');}catch(e){}
       };
       if(PAYMENTS.length){
         _openPayModal();
@@ -11669,7 +11656,7 @@ function go(id){
   // ── ไม่ทับ #pay-ID hash ──
   var curHash = window.location.hash.replace('#','');
   if(!curHash.startsWith('pay-')){
-    history.replaceState(null,'','#'+id);
+    try{history.replaceState(null,'','#'+id);}catch(e){}
   }
 
   // Lazy load iframes
